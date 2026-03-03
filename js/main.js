@@ -335,8 +335,8 @@ document.addEventListener("DOMContentLoaded", () => {
     map.on("mouseleave", "country-outline", () => (map.getCanvas().style.cursor = ""));
 
     map.on('idle', () => {
-        const currentData = map.querySourceFeatures('minerals').map(f => f.properties);
-        createChart("chartOne", currentData, 'pie');
+        //const currentData = map.querySourceFeatures('minerals').map(f => f.properties);
+        //createChart("chartOne", currentData, 'pie');
         //createChart("chartTwo", currentData, 'bar');
     });
 
@@ -357,7 +357,6 @@ function createChart(name,data, type) {
         data.forEach(d => {
             const country = d.COUNTRY;
             if (!country) return;
-
             counts[country] = (counts[country] || 0) + 1;
         });
 

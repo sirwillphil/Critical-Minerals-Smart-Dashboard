@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Top 10 REE Sites by Country</title>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        #chartOne {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chartOne"></div>
+
+<script>
+fetch("assets/ree.geojson")
+    .then(response => response.json())
+    .then(geojson => {
+
+        const counts = {};
+
+        geojson.features.forEach(feature => {
+            const country = feature.properties?.COUNTRY;
+            if (!country) return;
+
+            counts[country] = (counts[country] || 0) + 1;
+        });
+
+        const sorted = Object.entries(counts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10);
+
+        const trace = [{
+            labels: sorted.map(d => d[0]),
+            values: sorted.map(d => d[1]),
+            type: "pie",
+            textinfo: "label+percent",
+            hoverinfo: "label+value+percent",
+            domain: { x: [0, 1], y: [0, 1] }
+        }];
+
+        const layout = {
+            title: "Top 10 Countries by REE Site Count",
+            autosize: true,
+            margin: { l: 10, r: 10, t: 50, b: 10 }
+        };
+
+        Plotly.newPlot("chartOne", trace, layout, { responsive: true });
+
+    })
+    .catch(err => console.error("GeoJSON load error:", err));
+</script>
+
+</body>
+</html>
