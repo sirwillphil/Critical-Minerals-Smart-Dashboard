@@ -1,1 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Map 2 – REE Deposits by Type</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  #map {
+    height: 100vh;
+    width: 100%;
+  }
+
+  .legend {
+    background: white;
+    padding: 10px;
+    line-height: 18px;
+    color: #333;
+    font-size: 14px;
+  }
+
+  .legend i {
+    width: 14px;
+    height: 14px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.8;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+
+var map = L.map('map').setView([20, 0], 2);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+function getColor(type) {
+  switch(type) {
+    case "Carbonatite": return "#e41a1c";
+    case "Alkaline": return "#377eb8";
+    case "Placer": return "#4daf4a";
+    case "Laterite": return "#984ea3";
+    default: return "#ff7f00";
+  }
+}
+
+fetch("assets/ree.geojson")
+  .then(response => response.json())
+  .then(data => {
+
+    L.geoJSON(data, {
+      pointToLayer: function(feature, latlng) {
+        return L.circleMarker(latlng, {
+          radius: 6,
+          fillColor: getColor(feature.properties.DEPTYPE),
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+        });
+      },
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup(
+          "<b>Deposit Name:</b> " + feature.properties.DEPOSIT +
+          "<br><b>Type:</b> " + feature.properties.DEPTYPE +
+          "<br><b>Country:</b> " + feature.properties.COUNTRY
+        );
+      }
+    }).addTo(map);
+
+  });
+
+var legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function (map) {
+
+  var div = L.DomUtil.create('div', 'legend'),
+      types = ["Carbonatite", "Alkaline", "Placer", "Laterite"];
+
+  div.innerHTML += "<b>Deposit Type</b><br>";
+
+  for (var i = 0; i < types.length; i++) {
+    div.innerHTML +=
+      '<i style="background:' + getColor(types[i]) + '"></i> ' +
+      types[i] + '<br>';
+  }
+
+  return div;
+};
+
+legend.addTo(map);
+
+</script>
+
+</body>
+</html>
