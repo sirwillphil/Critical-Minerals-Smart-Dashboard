@@ -255,53 +255,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetMineralsToAll = setupCheckboxGroup("mineral", "mineral_all");
   const resetUseCasesToAll = setupCheckboxGroup("useCase", "useCase_all");
 
-  currentData = null;
-
   map.on("load", () => {
     map.addSource("countries", {
-        type: "vector",
-        url: "mapbox://mapbox.country-boundaries-v1"
+      type: "vector",
+      url: "mapbox://mapbox.country-boundaries-v1"
     });
 
-    map.addSource('minerals', {
-        type: 'geojson',
-        data: 'assets/ree.geojson'
-    })
-
     map.addLayer({
-        id: "country-outline",
-        type: "line",
-        source: "countries",
-        "source-layer": "country_boundaries",
-        paint: { "line-color": "rgba(255,255,255,0.18)", "line-width": 0.9 },
-        filter: [
+      id: "country-outline",
+      type: "line",
+      source: "countries",
+      "source-layer": "country_boundaries",
+      paint: { "line-color": "rgba(255,255,255,0.18)", "line-width": 0.9 },
+      filter: [
         "all",
         ["==", ["get", "disputed"], "false"],
         [
-            "any",
-            ["==", "all", ["get", "worldview"]],
-            ["in", "US", ["get", "worldview"]]
+          "any",
+          ["==", "all", ["get", "worldview"]],
+          ["in", "US", ["get", "worldview"]]
         ]
-        ]
+      ]
     });
 
     map.addLayer({
-        id: "country-highlight",
-        type: "line",
-        source: "countries",
-        "source-layer": "country_boundaries",
-        paint: { "line-color": "#00ffff", "line-width": 3 },
-        filter: ["==", ["get", "iso_3166_1"], ""]
+      id: "country-highlight",
+      type: "line",
+      source: "countries",
+      "source-layer": "country_boundaries",
+      paint: { "line-color": "#00ffff", "line-width": 3 },
+      filter: ["==", ["get", "iso_3166_1"], ""]
     });
-
-    map.addLayer({
-        id: 'mineral-points',
-        type: 'circle',
-        source: 'minerals',
-        paint: {
-            'circle-radius': 6,
-        }
-    })
 
     hideSymbols();
 
@@ -330,62 +314,10 @@ document.addEventListener("DOMContentLoaded", () => {
         .addTo(map);
     });
 
-
     map.on("mouseenter", "country-outline", () => (map.getCanvas().style.cursor = "pointer"));
     map.on("mouseleave", "country-outline", () => (map.getCanvas().style.cursor = ""));
-
-    map.on('idle', () => {
-        //const currentData = map.querySourceFeatures('minerals').map(f => f.properties);
-        //createChart("chartOne", currentData, 'pie');
-        //createChart("chartTwo", currentData, 'bar');
-    });
-
 
     setToggleGlyphs();
     resetAll();
   });
 });
-
-
-function createChart(name,data, type) {
-
-    if (type === "pie") {
-
-        const counts = {};
-
-        
-        data.forEach(d => {
-            const country = d.COUNTRY;
-            if (!country) return;
-            counts[country] = (counts[country] || 0) + 1;
-        });
-
-        // Convert to array and sort descending
-        const sorted = Object.entries(counts)
-            .sort((a, b) => b[1] - a[1]);
-
-        // Take top 10
-        const top10 = sorted.slice(0, 10);
-
-        // Build Plotly trace
-        const numbers = [{
-            labels: top10.map(d => d[0]),   // country names
-            values: top10.map(d => d[1]),   // counts
-            type: "pie",
-            textinfo: "label+percent",
-            hoverinfo: "label+value+percent"
-        }];
-
-        Plotly.newPlot(name, numbers, {
-            title: "Top 10 Countries by Site Count",
-            autosize: true,
-            margin: {
-                l: 40,
-                r: 20,
-                t: 40,
-                b: 40
-            }, 
-        });
-    }
-       
-}
