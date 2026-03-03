@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Critical Minerals Smart Dashboard (Template)</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <div id="top" class="app">
+
+    <div id="map"></div>
+
+    <button id="filterToggle" class="panel-toggle panel-toggle-left" title="Hide/Show Filters">◀</button>
+    <button id="chartToggle" class="panel-toggle panel-toggle-right" title="Hide/Show Charts">▶</button>
+
+    <aside id="filterPanel" class="side-panel side-left">
+      <div class="panel-title">Filters</div>
+
+      <button id="resetBtn" class="reset-btn">Reset</button>
+
+      <div class="control">
+        <label for="countrySearch">Search by Country</label>
+        <div class="searchRow">
+          <input id="countrySearch" type="text" placeholder="e.g., Chile" />
+          <button id="countrySearchBtn" class="btn">Search</button>
+        </div>
+      </div>
+
+      <div class="control">
+        <label>Minerals</label>
+
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="mineral_all" name="mineral" value="all" checked>
+            All Minerals
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" name="mineral" value="lithium">
+            Lithium
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" name="mineral" value="cobalt">
+            Cobalt
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" name="mineral" value="nickel">
+            Nickel
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" name="mineral" value="ree">
+            Rare Earth Elements
+          </label>
+        </div>
+      </div>
+
+      <div class="control">
+        <label>Use Cases</label>
+
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="useCase_all" name="useCase" value="all" checked>
+            All Use Cases
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" name="useCase" value="ev_batteries">
+            EV Batteries
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" name="useCase" value="grid_storage">
+            Grid Storage
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" name="useCase" value="electronics">
+            Electronics
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" name="useCase" value="defense">
+            Defense
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" name="useCase" value="renewables">
+            Renewables
+          </label>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div><strong>Selected country:</strong> <span id="statCountry">-</span></div>
+        <div><strong>ISO code:</strong> <span id="statISO">-</span></div>
+      </div>
+    </aside>
+
+    <aside id="chartPanel" class="side-panel side-right">
+      <div class="panel-title">Charts</div>
+
+      <div class="chartPlaceholder">Chart 1 Placeholder</div>
+      <div class="chartPlaceholder">Chart 2 Placeholder</div>
+      <div class="chartPlaceholder">Chart 3 Placeholder</div>
+    </aside>
+
+    <button id="toggleLabels" class="floating-btn">Toggle Labels</button>
+
+    <button id="infoJumpBtn" class="info-jump" title="More information">
+      More Information ↓
+    </button>
+
+  </div>
+
+  <section id="infoPage">
+    <div class="infoWrap">
+      <div class="infoHeaderRow">
+        <h2>More Information</h2>
+        <button id="backToMapBtn" class="back-btn">Back to Map ↑</button>
+      </div>
+    </div>
+  </section>
+
+  <script defer src="js/main.js"></script>
+</body>
+</html>
