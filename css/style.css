@@ -183,7 +183,8 @@ body{
 .muted{ color:rgba(255,255,255,0.62); font-size:9.5pt; }
 
 .chartPlaceholder{
-  height:150px;
+  height:300px;
+  width: 100%;
   background:rgba(255,255,255,0.06);
   border:1px dashed rgba(255,255,255,0.16);
   border-radius:10px;
@@ -195,6 +196,14 @@ body{
   font-size:10pt;
   color:rgba(255,255,255,0.85);
   margin-bottom:14px;
+}
+
+#chartOne{
+  color: red;
+}
+
+#chartTwo{
+  color: blue;
 }
 
 .floating-btn{
