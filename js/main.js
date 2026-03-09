@@ -166,8 +166,6 @@ document.addEventListener("DOMContentLoaded", () => {
       f.country?.toLowerCase() === name.toLowerCase()
     );
 
-    console.log("Country-filtered data:", countryFiltered);
-
     createChart(countryFiltered, "country");
 
     map.setFilter(IDS.layers.mineralPoints, ["==", ["downcase", ["get", "country"]], name.toLowerCase()]);
@@ -479,9 +477,9 @@ document.addEventListener("DOMContentLoaded", () => {
       labels: top.map(d => d[0]),
       values: top.map(d => d[1]),
       type: "pie",
-      textinfo: "label+percent",
+      textinfo: "percent",
       hoverinfo: "label+value+percent"
-    }], { title, autosize: true, margin: { l: 50, r: 30, t: 30, b: 50 } },
+    }], {title: { text: title }, autosize: true, margin: { l: 50, r: 30, t: 50, b: 50 } },
     { responsive: true }
     );
   }
@@ -493,7 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
       x: top.map(d => d[0]),
       y: top.map(d => d[1]),
       type: "bar"
-    }], { title, autosize: true, margin: { l: 40, r: 20, t: 30, b: 50 } });
+    }], {title: { text: title }, autosize: true, margin: { l: 40, r: 20, t: 50, b: 50 } });
   }
 
   function renderCharts(allFeatures) {
