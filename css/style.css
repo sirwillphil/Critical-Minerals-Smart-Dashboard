@@ -26,7 +26,7 @@ body{
 .app.left-collapsed{ --leftInset: 0px; }
 .app.right-collapsed{ --rightInset: 0px; }
 
-#map{
+#mapDiv{
   position:absolute;
   top:0;
   bottom:0;
@@ -183,7 +183,7 @@ body{
 .muted{ color:rgba(255,255,255,0.62); font-size:9.5pt; }
 
 .chartPlaceholder{
-  height:150px;
+  height:250px;
   background:rgba(255,255,255,0.06);
   border:1px dashed rgba(255,255,255,0.16);
   border-radius:10px;
@@ -287,4 +287,12 @@ body{
   height: 16px;
   accent-color: #00ffff;
   cursor: pointer;
+}
+
+#chartOne {
+  width: 100%;
+}
+
+#chartTwo {
+  width: 100%;
 }

@@ -1,7 +1,7 @@
 mapboxgl.accessToken =
   "pk.eyJ1IjoibGlhbnM3NyIsImEiOiJjbWt6NGxhMjcwZTJsM2Vwd2RtbWVvZHRuIn0.HDVAEM1yBC3D51XX3B4NPw";
 
-const DEFAULT_VIEW = { center: [10, 20], zoom: 1.6 };
+const DEFAULT_VIEW = { center: [9, 20], zoom: 1 };
 
 const MAP_ANIMATION = {
   fitPadding: 60,
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const chartToggle = document.getElementById("chartToggle");
 
   const map = new mapboxgl.Map({
-    container: "map",
+    container: "mapDiv",
     style: "mapbox://styles/mapbox/dark-v10",
     projection: "mercator",
     center: DEFAULT_VIEW.center,
@@ -162,6 +162,16 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
+    const countryFiltered = allMineralData.filter(f =>
+      f.country?.toLowerCase() === name.toLowerCase()
+    );
+
+    console.log("Country-filtered data:", countryFiltered);
+
+    createChart(countryFiltered, "country");
+
+    map.setFilter(IDS.layers.mineralPoints, ["==", ["downcase", ["get", "country"]], name.toLowerCase()]);
+
     setSelectionUI({ name, iso2: iso2 || "—" });
     if (iso2) applyCountryHighlight(iso2);
   }
@@ -187,6 +197,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (input) input.value = "";
     setSelectionUI();
     applyCountryHighlight("");
+
+    map.setFilter(IDS.layers.mineralPoints, null);
 
     map.flyTo({
       ...DEFAULT_VIEW,
@@ -282,6 +294,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return setAllChecked;
   }
 
+  const allCheckboxes = document.querySelectorAll('input[type="checkbox"][name="mineral"], input[type="checkbox"][name="useCase"]');
+  allCheckboxes.forEach(box => {
+    on(box, "change", () => setTimeout(() => renderCharts(allMineralData), 0));
+  });
+
   /** Extract a readable country name and ISO2 code from a map feature. */
   function getCountryFeatureInfo(feature) {
     const props = feature?.properties || {};
@@ -314,7 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     map.addSource(IDS.sources.minerals, {
       type: "geojson",
-      data: "assets/deposit.geojson"
+      data: "assets/deposit-cleaned.geojson"
     });
   }
 
@@ -394,6 +411,10 @@ document.addEventListener("DOMContentLoaded", () => {
       setSelectionUI({ name, iso2: iso2 || "—" });
       if (iso2) applyCountryHighlight(iso2);
 
+      const countryFiltered = allMineralData.filter(f =>
+        f.country?.toLowerCase() === name.toLowerCase()
+      );
+
       new mapboxgl.Popup({ closeOnClick: true, closeButton: true })
         .setLngLat(e.lngLat)
         .setHTML(buildCountryPopupHTML(name, iso2))
@@ -417,254 +438,113 @@ document.addEventListener("DOMContentLoaded", () => {
     setSymbolsHidden(true);
     setToggleGlyphs();
     resetAll();
+    fetch("assets/deposit.geojson")
+    .then(res => res.json())
+    .then(geojson => {
+      allMineralData = geojson.features.map(f => f.properties);
+      renderCharts(allMineralData);
+    });
   });
-});
 
-function createChart(data,filterType) {
+  function getActiveCheckboxValues(name, allId){
+    const allBox = document.getElementById(allId);
+    console.log(`Checking active checkboxes for ${name}, allId: ${allId}, allBox checked: ${allBox?.checked}`);
+    if (allBox?.checked) return null;
 
-  if(filterType === "country") {
-    //Graphy one Commodity distribution for country(pie Chart)
-    const commodityCountsCountry = {};
-    data.forEach(d => {
-      const commodity = d.commodity;
-      if (!commodity) return;
-      commodityCountsCountry[commodity] = (commodityCountsCountry[commodity] || 0) + 1;
-    });
+    const boxes = [...document.querySelectorAll(`input[type="checkbox"][name="${name}"]`)]
+      .filter((box) => box.id !== allId && box.checked);
 
-    const commodityCountryData = [{
-        labels: Object.keys(commodityCountsCountry),
-        values: Object.values(commodityCountsCountry),
-        type: "pie",
-        textinfo: "label+percent",
-        hoverinfo: "label+value+percent"
-    }];
-
-    Plotly.newPlot("chartOne", commodityCountryData, {
-        title: "Commodity Breakdown",
-        autosize: true,
-        margin: {
-            l: 40,
-            r: 20,
-            t: 40,
-            b: 40
-        }, 
-    });
-    //Graph two depsit type for country (pie chart)
-    const depositCountsCountry = {};
-    data.forEach(d => {
-      const depositType = d.dep_type;
-      if (!depositType) return;
-      depositCountsCountry[depositType] = (depositCountsCountry[depositType] || 0) + 1;
-    })
-
-    const depositCountryData = [{
-      labels: Object.keys(depositCountsCountry),
-      values: Object.values(depositCountsCountry),
-      type: "pie",
-      textinfo: "label+percent",
-      hoverinfo: "label+value+percent"
-    }];
-
-    Plotly.newPlot("chartTwo", commodityCountryData, {
-        title: "Commodity Breakdown",
-        autosize: true,
-        margin: {
-            l: 40,
-            r: 20,
-            t: 40,
-            b: 40
-        }, 
-    });
-  } else if (filterType === "useCase") {
-
-    //Graph one commodity distribution for use case (pie chart)
-    const useCaseCommoditycounts = {};
-
-    data.forEach(d => {
-        const commodity = d.commodity;
-        if (!commodity) return;
-
-        useCaseCommoditycounts[commodity] = (useCaseCommoditycounts[commodity] || 0) + 1;
-    });
-
-    const useCaseComodity = [{
-          labels: useCaseTop10.map(d => d[0]),   // country names
-          values: useCaseTop10.map(d => d[1]),   // counts
-          type: "bar",
-          textinfo: "label+percent",
-          hoverinfo: "label+value+percent"
-      }];
-
-    Plotly.newPlot("chartOne", useCaseComodity, {
-        title: "Commodity Breakdown for Use Case",
-        autosize: true,
-        margin: {
-            l: 40,
-            r: 20,
-            t: 40,
-            b: 40
-        }, 
-    });
-
-    //graph two top 10 countries distribution for use case (bar chart)
-    const useCasecounts = {};
-
-      data.forEach(d => {
-          const country = d.country;
-          if (!country) return;
-
-          useCaseCounts[country] = (useCasecounts[country] || 0) + 1;
-      });
-
-      // Convert to array and sort descending
-      const useCasesorted = Object.entries(counts)
-          .sort((a, b) => b[1] - a[1]);
-
-      // Take top 10
-      const useCaseTop10 = sorted.slice(0, 10);
-
-      // Build Plotly trace
-      const useCase = [{
-          labels: useCaseTop10.map(d => d[0]),   // country names
-          values: useCaseTop10.map(d => d[1]),   // counts
-          type: "bar",
-          textinfo: "label+percent",
-          hoverinfo: "label+value+percent"
-      }];
-
-      Plotly.newPlot("chartTwo", useCase, {
-          title: "Top 10 Countries by Site Count",
-          autosize: true,
-          margin: {
-              l: 40,
-              r: 20,
-              t: 40,
-              b: 40
-          }, 
-      });
-  } else if (filterType === "comodity") {
-    //Graph one country distiribution for commondity (pie chart)
-    const commodityCounts = {};
-    data.forEach(d => {
-      const country = d.country;
-      const commodity = d.commodity;
-      if (!country || !commodity) return;
-
-      if (!comodityCounty[commodity]) comodityCounty[commodity] = {};
-      comodityCounty[commodity][country] = (comodityCounty[commodity][country] || 0) + 1;
-    })
-
-    const commodityDistribution = [{
-      labels: Object.keys(commodityCounts),
-      values: Object.values(commodityCounts),
-      type: "pie",
-      textinfo: "label+percent",
-      hoverinfo: "label+value+percent"
-    }];
-
-    Plotly.newPlot("chartOne", commodityDistribution, {
-      title: "Country Breakdown for Commodity",
-      autosize: true,
-      margin: {
-          l: 40,
-          r: 20,
-          t: 40,
-          b: 40
-      }, 
-    });
-
-    //graph two deposit type distribution for commondity (bar chart)
-    const depositCounts = {};
-    data.forEach(d => {
-      const depType = d.dep_type;
-      if (!depType) return;
-
-      depositCounts[depType] = (depositCounts[depType] || 0) + 1;
-    })
-
-    const depositDistribution = [{
-      labels: Object.keys(depositCounts),
-      values: Object.values(depositCounts),
-      type: "bar",
-      textinfo: "label+percent",
-      hoverinfo: "label+value+percent"
-    }];
-
-    Plotly.newPlot("chartTwo", depositDistribution, {
-      title: "Deposit Type Breakdown for Commodity",
-      autosize: true,
-      margin: {
-          l: 40,
-          r: 20,
-          t: 40,
-          b: 40
-      }, 
-    });
-  } else {
-    //defualt state
-    //Graph One Commoditiy breakdown(pie chart)
-    const commodityCounts = {};
-
-    data.forEach(d => {
-        const commodity = d.commodity;
-        if (!commodity) return;
-
-        commodityCounts[commodity] = (commodityCounts[commodity] || 0) + 1;
-    });
-
-    const commodityData = [{
-        labels: Object.keys(commodityCounts),
-        values: Object.values(commodityCounts),
-        type: "pie",
-        textinfo: "label+percent",
-        hoverinfo: "label+value+percent"
-    }];
-
-    Plotly.newPlot("chartOne", commodityData, {
-        title: "Commodity Breakdown",
-        autosize: true,
-        margin: {
-            l: 40,
-            r: 20,
-            t: 40,
-            b: 40
-        }, 
-    });
-    //Graph Two Top 10 countries with most sites (bar chart)
-    const counts = {};
-
-    data.forEach(d => {
-        const country = d.country;
-        if (!country) return;
-
-        counts[country] = (counts[country] || 0) + 1;
-    });
-
-    // Convert to array and sort descending
-    const sorted = Object.entries(counts)
-        .sort((a, b) => b[1] - a[1]);
-
-    // Take top 10
-    const top10 = sorted.slice(0, 10);
-
-    // Build Plotly trace
-    const numbers = [{
-        labels: top10.map(d => d[0]),   // country names
-        values: top10.map(d => d[1]),   // counts
-        type: "bar",
-        textinfo: "label+percent",
-        hoverinfo: "label+value+percent"
-    }];
-
-    Plotly.newPlot("chartTwo", numbers, {
-        title: "Top 10 Countries by Site Count",
-        autosize: true,
-        margin: {
-            l: 40,
-            r: 20,
-            t: 40,
-            b: 40
-        }, 
-    });
+    return boxes.map(box => box.value);
   }
-}
+  
+  function countByField(data, field) {
+    const counts = {};
+    data.forEach(d => {
+      const val = d[field];
+      if (val) counts[val] = (counts[val] || 0) + 1;
+    });
+    return counts;
+  }
+
+  function plotPie(divId, counts, title) {
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const top = sorted.slice(0, 10);
+    Plotly.newPlot(divId, [{
+      labels: top.map(d => d[0]),
+      values: top.map(d => d[1]),
+      type: "pie",
+      textinfo: "label+percent",
+      hoverinfo: "label+value+percent"
+    }], { title, autosize: true, margin: { l: 50, r: 30, t: 30, b: 50 } },
+    { responsive: true }
+    );
+  }
+
+  function plotBar(divId, counts, title) {
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const top = sorted.slice(0, 10);
+    Plotly.newPlot(divId, [{
+      x: top.map(d => d[0]),
+      y: top.map(d => d[1]),
+      type: "bar"
+    }], { title, autosize: true, margin: { l: 40, r: 20, t: 30, b: 50 } });
+  }
+
+  function renderCharts(allFeatures) {
+    const activeMinerals = getActiveCheckboxValues("mineral", "mineral_all");
+    console.log("Active Minerals:", activeMinerals);
+    const activeUseCases = getActiveCheckboxValues("useCase", "useCase_all");
+    console.log("Active Use Cases:", activeUseCases);
+
+    let filtered = allFeatures;
+    let mapFilter = null;
+
+    if (activeMinerals) {
+      filtered = filtered.filter(f => {
+        const commodities = f.commodity.split(",").map(s => s.trim().toLowerCase());
+        return activeMinerals.some(m => commodities.includes(m));
+      });
+
+      // Substring check: does the commodity field contain any of the active minerals?
+      const mineralChecks = activeMinerals.map(m => 
+        ["in", m, ["downcase", ["get", "commodity"]]]
+      );
+      mapFilter = mineralChecks.length === 1 ? mineralChecks[0] : ["any", ...mineralChecks];
+    }
+    if (activeUseCases) {
+      filtered = filtered.filter(f => activeUseCases.includes(f.use_case));
+      // TODO: build a proper use-case map filter if needed
+    }
+
+    if (mapFilter) {
+      map.setFilter(IDS.layers.mineralPoints, mapFilter);
+    } else {
+      map.setFilter(IDS.layers.mineralPoints, null);
+    }
+
+    const filterType = activeMinerals ? "commodity"
+      : activeUseCases ? "useCase"
+      : "default";
+
+    createChart(filtered, filterType);
+  }
+
+  function createChart(data, filterType) {
+    if (filterType === "country") {
+      plotPie("chartOne", countByField(data, "commodity"), "Commodity Breakdown");
+      plotPie("chartTwo", countByField(data, "dep_type"), "Deposit Type Breakdown");
+
+    } else if (filterType === "useCase") {
+      plotPie("chartOne", countByField(data, "commodity"), "Commodity Breakdown for Use Case");
+      plotBar("chartTwo", countByField(data, "country"), "Top 10 Countries by Site Count");
+
+    } else if (filterType === "commodity") {
+      plotPie("chartOne", countByField(data, "country"), "Country Breakdown for Commodity");
+      plotBar("chartTwo", countByField(data, "dep_type"), "Deposit Type Breakdown");
+
+    } else {
+      plotPie("chartOne", countByField(data, "commodity"), "Commodity Breakdown");
+      plotBar("chartTwo", countByField(data, "country"), "Top 10 Countries by Site Count");
+    }
+  }
+});
