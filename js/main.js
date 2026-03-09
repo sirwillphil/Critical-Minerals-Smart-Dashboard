@@ -34,6 +34,9 @@ const COUNTRY_BASE_FILTER = [
   ]
 ];
 
+selectedCountry = null;
+allMineralData = [];
+
 const useCases = {
   batteries: { label: "Batteries", minerals: ["Lithium", "Nickel", "Cobalt", "Graphite", "Manganese", "Vanadium", "Lead", "Fluorine", "Fluorite", "Phosphorus"] },
   evs: { label: "EVs", minerals: ["Lithium", "Nickel", "Cobalt", "Graphite", "Rare earth elements", "Copper", "Aluminum", "Magnesium", "Manganese"] },
@@ -182,16 +185,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    const countryFiltered = allMineralData.filter(f =>
-      f.country?.toLowerCase() === name.toLowerCase()
-    );
-
-    createChart(countryFiltered, "country");
-
-    map.setFilter(IDS.layers.mineralPoints, ["==", ["downcase", ["get", "country"]], name.toLowerCase()]);
-
     setSelectionUI({ name, iso2: iso2 || "—" });
     if (iso2) applyCountryHighlight(iso2);
+
+    selectedCountry = name;
+    renderCharts(allMineralData);
   }
 
   /** Search for a country name entered by the user. */
@@ -218,10 +216,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     map.setFilter(IDS.layers.mineralPoints, null);
 
+    selectedCountry = null;
+
     map.flyTo({
       ...DEFAULT_VIEW,
       duration: MAP_ANIMATION.resetDuration
     });
+    renderCharts(allMineralData);
   }
 
   /** Update the toggle button glyph and app collapsed class for a panel. */
@@ -426,6 +427,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const { name, iso2 } = getCountryFeatureInfo(feature);
 
+      selectedCountry = name;
+
       setSelectionUI({ name, iso2: iso2 || "—" });
       if (iso2) applyCountryHighlight(iso2);
 
@@ -516,40 +519,61 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderCharts(allFeatures) {
     const activeMinerals = getActiveCheckboxValues("mineral", "mineral_all");
-    console.log("Active Minerals:", activeMinerals);
     const activeUseCases = getActiveCheckboxValues("useCase", "useCase_all");
-    console.log("Active Use Cases:", activeUseCases);
 
     let filtered = allFeatures;
-    let mapFilter = null;
+    let mapFilters = [];  // collect all filter expressions
+    let filterType = "default";
+
+    if (selectedCountry) {
+      filtered = filtered.filter(f =>
+        f.country?.toLowerCase() === selectedCountry.toLowerCase()
+      );
+      mapFilters.push(["==", ["downcase", ["get", "country"]], selectedCountry.toLowerCase()]);
+      filterType = "country";
+    }
 
     if (activeMinerals) {
       filtered = filtered.filter(f => {
-        const commodities = f.commodity.split(",").map(s => s.trim().toLowerCase());
+        const commodities = f.commodity.split(/[,\-]/).map(s => s.trim().toLowerCase());
         return activeMinerals.some(m => commodities.includes(m));
       });
-
-      // Substring check: does the commodity field contain any of the active minerals?
-      const mineralChecks = activeMinerals.map(m => 
+      const mineralChecks = activeMinerals.map(m =>
         ["in", m, ["downcase", ["get", "commodity"]]]
       );
-      mapFilter = mineralChecks.length === 1 ? mineralChecks[0] : ["any", ...mineralChecks];
+      mapFilters.push(mineralChecks.length === 1 ? mineralChecks[0] : ["any", ...mineralChecks]);
+      if (!selectedCountry) filterType = "commodity";
     }
+
     if (activeUseCases) {
-      filtered = filtered.filter(f => activeUseCases.includes(f.use_case));
-      // TODO: build a proper use-case map filter if needed
+      // Collect all minerals for the selected use cases
+      const useCaseMinerals = new Set();
+      activeUseCases.forEach(uc => {
+        const minerals = useCases[uc]?.minerals || [];
+        minerals.forEach(m => useCaseMinerals.add(m.toLowerCase()));
+      });
+
+      filtered = filtered.filter(f => {
+        const commodities = f.commodity.split(',').map(s => s.trim().toLowerCase());
+        return commodities.some(c => useCaseMinerals.has(c));
+      });
+
+      // Map filter: substring check for each mineral
+      const ucChecks = [...useCaseMinerals].map(m =>
+        ["in", m, ["downcase", ["get", "commodity"]]]
+      );
+      mapFilters.push(ucChecks.length === 1 ? ucChecks[0] : ["any", ...ucChecks]);
+
+      if (!selectedCountry && !activeMinerals) filterType = "useCase";
     }
 
-    if (mapFilter) {
-      map.setFilter(IDS.layers.mineralPoints, mapFilter);
-    } else {
-      map.setFilter(IDS.layers.mineralPoints, null);
-    }
+    // Combine all filters with "all" or clear if none
+    const mapFilter = mapFilters.length === 0 ? null
+      : mapFilters.length === 1 ? mapFilters[0]
+      : ["all", ...mapFilters];
 
-    const filterType = activeMinerals ? "commodity"
-      : activeUseCases ? "useCase"
-      : "default";
-
+    console.log("mapFilter:", JSON.stringify(mapFilter));
+    map.setFilter(IDS.layers.mineralPoints, mapFilter);
     createChart(filtered, filterType);
   }
 
