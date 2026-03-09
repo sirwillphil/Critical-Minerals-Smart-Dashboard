@@ -438,7 +438,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setSymbolsHidden(true);
     setToggleGlyphs();
     resetAll();
-    fetch("assets/deposit.geojson")
+    fetch("assets/deposit-cleaned.geojson")
     .then(res => res.json())
     .then(geojson => {
       allMineralData = geojson.features.map(f => f.properties);
@@ -460,11 +460,17 @@ document.addEventListener("DOMContentLoaded", () => {
   function countByField(data, field) {
     const counts = {};
     data.forEach(d => {
-      const val = d[field];
-      if (val) counts[val] = (counts[val] || 0) + 1;
+      const raw = d[field];
+      if (!raw) return;
+
+      const values = String(raw).split(/[,\-]/).map(s => s.trim());
+      values.forEach(val => {
+        if (val) counts[val] = (counts[val] || 0) + 1;
+      });
     });
     return counts;
   }
+  
 
   function plotPie(divId, counts, title) {
     const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
