@@ -34,6 +34,26 @@ const COUNTRY_BASE_FILTER = [
   ]
 ];
 
+const useCases = {
+  batteries: { label: "Batteries", minerals: ["Lithium", "Nickel", "Cobalt", "Graphite", "Manganese", "Vanadium", "Lead", "Fluorine", "Fluorite", "Phosphorus"] },
+  evs: { label: "EVs", minerals: ["Lithium", "Nickel", "Cobalt", "Graphite", "Rare earth elements", "Copper", "Aluminum", "Magnesium", "Manganese"] },
+  grid: { label: "Grid", minerals: ["Copper", "Aluminum", "Silver", "Lead"] },
+  renewables: { label: "Renewables", minerals: ["Rare earth elements", "Copper", "Silver", "Tellurium", "Aluminum", "Nickel"] },
+  magnets: { label: "Magnets", minerals: ["Rare earth elements", "Boron", "Strontium"] },
+  electronics: { label: "Electronics", minerals: ["Tin", "Silver", "Tantalum", "Copper", "Arsenic", "Cesium", "Rubidium", "Fluorine", "Fluorite"] },
+  alloys: { label: "Alloys", minerals: ["Chromium", "Nickel", "Manganese", "Vanadium", "Niobium", "Magnesium", "Zinc"] },
+  aerospace: { label: "Aerospace", minerals: ["Titanium", "Beryllium", "Niobium", "Tungsten", "Tantalum", "Aluminum", "Magnesium", "Rare earth elements", "Scandium"] },
+  catalysts: { label: "Catalysts", minerals: ["Platinum", "Palladium", "Platinum-group elements", "Vanadium", "Fluorine", "Fluorite"] },
+  hydrogen: { label: "Hydrogen", minerals: ["Platinum", "Platinum-group elements", "Scandium"] },
+  solar: { label: "Solar", minerals: ["Silver", "Tellurium"] },
+  nuclear: { label: "Nuclear", minerals: ["Uranium", "Zirconium"] },
+  fertilizer: { label: "Fertilizer", minerals: ["Phosphate", "Phosphate rock", "Phosphorus", "Potash", "Boron"] },
+  ceramics: { label: "Ceramics", minerals: ["Boron", "Feldspar", "Zirconium", "Lithium"] },
+  drilling: { label: "Drilling", minerals: ["Barite", "Cesium", "Strontium"] },
+  coatings: { label: "Coatings", minerals: ["Zinc", "Aluminum"] },
+  tools: { label: "Tools", minerals: ["Tungsten", "Chromium", "Nickel", "Tin"] }
+};
+
 /** Trim and normalize any input into a safe string. */
 function normalize(str) {
   return String(str || "").trim();
