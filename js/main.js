@@ -461,7 +461,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const raw = d[field];
       if (!raw) return;
 
-      const values = String(raw).split(/[,\-]/).map(s => s.trim());
+      const values = String(raw).split(',').map(s => s.trim());
       values.forEach(val => {
         if (val) counts[val] = (counts[val] || 0) + 1;
       });
