@@ -579,19 +579,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function createChart(data, filterType) {
     if (filterType === "country") {
-      plotPie("chartOne", countByField(data, "commodity"), "Commodity Breakdown");
+      plotPie("chartOne", countByField(data, "commodity"), "Mineral Breakdown");
       plotPie("chartTwo", countByField(data, "dep_type"), "Deposit Type Breakdown");
 
     } else if (filterType === "useCase") {
-      plotPie("chartOne", countByField(data, "commodity"), "Commodity Breakdown for Use Case");
+      plotPie("chartOne", countByField(data, "commodity"), "Mineral Breakdown for Use Case");
       plotBar("chartTwo", countByField(data, "country"), "Top 10 Countries by Site Count");
 
     } else if (filterType === "commodity") {
-      plotPie("chartOne", countByField(data, "country"), "Country Breakdown for Commodity");
+      plotPie("chartOne", countByField(data, "country"), "Country Breakdown for Mineral");
       plotBar("chartTwo", countByField(data, "dep_type"), "Deposit Type Breakdown");
 
     } else {
-      plotPie("chartOne", countByField(data, "commodity"), "Commodity Breakdown");
+      plotPie("chartOne", countByField(data, "commodity"), "Mineral Breakdown");
       plotBar("chartTwo", countByField(data, "country"), "Top 10 Countries by Site Count");
     }
   }
