@@ -3,11 +3,45 @@ mapboxgl.accessToken =
 
 const DEFAULT_VIEW = { center: [10, 20], zoom: 1.6 };
 
+const MAP_ANIMATION = {
+  fitPadding: 60,
+  fitDuration: 1200,
+  searchDuration: 1400,
+  resetDuration: 1000,
+  resizeDelay: 280,
+  countryZoom: 4
+};
+
+const IDS = {
+  sources: {
+    countries: "countries",
+    minerals: "minerals"
+  },
+  layers: {
+    countryOutline: "country-outline",
+    countryHighlight: "country-highlight",
+    mineralPoints: "mineral-points"
+  }
+};
+
+const COUNTRY_BASE_FILTER = [
+  "all",
+  ["==", ["get", "disputed"], "false"],
+  [
+    "any",
+    ["==", "all", ["get", "worldview"]],
+    ["in", "US", ["get", "worldview"]]
+  ]
+];
+
+/** Trim and normalize any input into a safe string. */
 function normalize(str) {
   return String(str || "").trim();
 }
-function safeSetText(el, txt) {
-  if (el) el.textContent = txt;
+
+/** Attach an event listener only if the element exists. */
+function on(el, event, handler) {
+  if (el) el.addEventListener(event, handler);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -16,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const infoBtn = document.getElementById("infoJumpBtn");
   const backBtn = document.getElementById("backToMapBtn");
   const infoPage = document.getElementById("infoPage");
-  const top = document.getElementById("top");
 
   const statCountry = document.getElementById("statCountry");
   const statISO = document.getElementById("statISO");
@@ -46,40 +79,48 @@ document.addEventListener("DOMContentLoaded", () => {
     maxZoom: 9
   });
 
+  let symbolsHidden = false;
+
+  /** Update the selected country text in the side panel. */
   function setSelectionUI({ name = "—", iso2 = "—" } = {}) {
-    safeSetText(statCountry, name);
-    safeSetText(statISO, iso2);
+    if (statCountry) statCountry.textContent = name;
+    if (statISO) statISO.textContent = iso2;
   }
 
-  function fitToBBox(bbox, duration = 1200) {
+  /** Scroll the page to a target element. */
+  function scrollToEl(el) {
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  /** Fit the map view to a [minX, minY, maxX, maxY] bounding box. */
+  function fitToBBox(bbox, duration = MAP_ANIMATION.fitDuration) {
     if (!Array.isArray(bbox) || bbox.length !== 4) return;
-    map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], {
-      padding: 60,
-      duration
-    });
-  }
 
-  function applyCountryHighlight(iso2) {
-    if (!map.getLayer("country-highlight")) return;
-    const code = (iso2 || "").toUpperCase();
-
-    if (!code) {
-      map.setFilter("country-highlight", ["==", ["get", "iso_3166_1"], ""]);
-      return;
-    }
-
-    map.setFilter("country-highlight", [
-      "all",
-      ["==", ["get", "disputed"], "false"],
+    map.fitBounds(
       [
-        "any",
-        ["==", "all", ["get", "worldview"]],
-        ["in", "US", ["get", "worldview"]]
+        [bbox[0], bbox[1]],
+        [bbox[2], bbox[3]]
       ],
-      ["==", ["get", "iso_3166_1"], code]
-    ]);
+      {
+        padding: MAP_ANIMATION.fitPadding,
+        duration
+      }
+    );
   }
 
+  /** Apply or clear the highlighted country boundary by ISO2 code. */
+  function applyCountryHighlight(iso2 = "") {
+    if (!map.getLayer(IDS.layers.countryHighlight)) return;
+
+    const code = iso2.toUpperCase();
+    const filter = code
+      ? [...COUNTRY_BASE_FILTER, ["==", ["get", "iso_3166_1"], code]]
+      : ["==", ["get", "iso_3166_1"], ""];
+
+    map.setFilter(IDS.layers.countryHighlight, filter);
+  }
+
+  /** Fetch a country result from Mapbox geocoding. */
   async function geocodeCountry(countryName) {
     const q = normalize(countryName);
     if (!q) return null;
@@ -97,154 +138,143 @@ document.addEventListener("DOMContentLoaded", () => {
     const feature = json?.features?.[0];
     if (!feature) return null;
 
-    const iso2 = (feature?.properties?.short_code || "").toUpperCase();
-    const name = feature?.text || feature?.place_name || q;
-    const bbox = feature?.bbox;
-    const center = feature?.center;
-
-    return { name, iso2, bbox, center };
+    return {
+      name: feature?.text || feature?.place_name || q,
+      iso2: (feature?.properties?.short_code || "").toUpperCase(),
+      bbox: feature?.bbox,
+      center: feature?.center
+    };
   }
 
+  /** Zoom to a geocoded country result and update the UI. */
   function zoomToCountryResult(result) {
     if (!result) return;
 
-    if (Array.isArray(result.bbox) && result.bbox.length === 4) {
-      fitToBBox(result.bbox, 1400);
-    } else if (Array.isArray(result.center) && result.center.length === 2) {
-      map.flyTo({ center: result.center, zoom: 4, duration: 1400 });
+    const { name, iso2, bbox, center } = result;
+
+    if (Array.isArray(bbox) && bbox.length === 4) {
+      fitToBBox(bbox, MAP_ANIMATION.searchDuration);
+    } else if (Array.isArray(center) && center.length === 2) {
+      map.flyTo({
+        center,
+        zoom: MAP_ANIMATION.countryZoom,
+        duration: MAP_ANIMATION.searchDuration
+      });
     }
 
-    setSelectionUI({ name: result.name, iso2: result.iso2 || "—" });
-    if (result.iso2) applyCountryHighlight(result.iso2);
+    setSelectionUI({ name, iso2: iso2 || "—" });
+    if (iso2) applyCountryHighlight(iso2);
   }
 
+  /** Search for a country name entered by the user. */
   async function handleCountrySearch() {
     const query = normalize(input?.value);
-    if (!query) {
-      alert("Type a country name (example: Chile).");
-      return;
-    }
+    if (!query) return alert("Type a country name (example: Chile).");
 
     const result = await geocodeCountry(query);
     if (!result) {
-      alert("Country not found. Try another spelling.\nTip: enter a country name only.");
-      return;
+      return alert("Country not found. Try another spelling.\nTip: enter a country name only.");
     }
 
     zoomToCountryResult(result);
   }
 
+  /** Reset UI selections, filters, and map view to defaults. */
   function resetAll() {
-    if (typeof resetMineralsToAll === "function") resetMineralsToAll();
-    if (typeof resetUseCasesToAll === "function") resetUseCasesToAll();
+    resetMineralsToAll?.();
+    resetUseCasesToAll?.();
 
     if (input) input.value = "";
-    setSelectionUI({ name: "—", iso2: "—" });
+    setSelectionUI();
     applyCountryHighlight("");
 
-    map.flyTo({ center: DEFAULT_VIEW.center, zoom: DEFAULT_VIEW.zoom, duration: 1000 });
-  }
-
-  if (infoBtn && infoPage) {
-    infoBtn.addEventListener("click", () => {
-      infoPage.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  }
-  if (backBtn && top) {
-    backBtn.addEventListener("click", () => {
-      top.scrollIntoView({ behavior: "smooth", block: "start" });
+    map.flyTo({
+      ...DEFAULT_VIEW,
+      duration: MAP_ANIMATION.resetDuration
     });
   }
 
+  /** Update the toggle button glyph and app collapsed class for a panel. */
+  function updatePanelToggle(panel, toggle, collapsedClass, collapsedGlyph, expandedGlyph) {
+    if (!panel || !toggle) return;
+
+    const collapsed = panel.classList.contains("collapsed");
+    toggle.textContent = collapsed ? collapsedGlyph : expandedGlyph;
+    app?.classList.toggle(collapsedClass, collapsed);
+  }
+
+  /** Refresh the visible glyphs for both side panels. */
   function setToggleGlyphs() {
-    if (filterToggle && filterPanel) {
-      const collapsed = filterPanel.classList.contains("collapsed");
-      filterToggle.textContent = collapsed ? "▶" : "◀";
-      if (app) app.classList.toggle("left-collapsed", collapsed);
-    }
-    if (chartToggle && chartPanel) {
-      const collapsed = chartPanel.classList.contains("collapsed");
-      chartToggle.textContent = collapsed ? "◀" : "▶";
-      if (app) app.classList.toggle("right-collapsed", collapsed);
-    }
+    updatePanelToggle(filterPanel, filterToggle, "left-collapsed", "▶", "◀");
+    updatePanelToggle(chartPanel, chartToggle, "right-collapsed", "◀", "▶");
   }
 
+  /** Resize the map after layout-changing UI transitions. */
   function resizeMapSoon() {
-    window.setTimeout(() => map.resize(), 280);
+    setTimeout(() => map.resize(), MAP_ANIMATION.resizeDelay);
   }
 
-  if (filterToggle && filterPanel) {
-    filterToggle.addEventListener("click", () => {
-      filterPanel.classList.toggle("collapsed");
-      setToggleGlyphs();
-      resizeMapSoon();
-    });
-  }
-  if (chartToggle && chartPanel) {
-    chartToggle.addEventListener("click", () => {
-      chartPanel.classList.toggle("collapsed");
-      setToggleGlyphs();
-      resizeMapSoon();
-    });
+  /** Toggle a side panel and then refresh the layout. */
+  function togglePanel(panel) {
+    panel?.classList.toggle("collapsed");
+    setToggleGlyphs();
+    resizeMapSoon();
   }
 
-  let symbolsHidden = false;
-  function setAllSymbolOpacity(opacity) {
-    const style = map.getStyle();
-    if (!style || !Array.isArray(style.layers)) return;
-    style.layers.forEach((layer) => {
-      if (layer.type !== "symbol") return;
-      if (!map.getLayer(layer.id)) return;
-      try { map.setPaintProperty(layer.id, "text-opacity", opacity); } catch (e) {}
-      try { map.setPaintProperty(layer.id, "icon-opacity", opacity); } catch (e) {}
-    });
-  }
-  function hideSymbols() {
-    setAllSymbolOpacity(0);
-    symbolsHidden = true;
-    if (toggleLabelsBtn) toggleLabelsBtn.textContent = "Show Labels";
-  }
-  function showSymbols() {
-    setAllSymbolOpacity(1);
-    symbolsHidden = false;
-    if (toggleLabelsBtn) toggleLabelsBtn.textContent = "Hide Labels";
-  }
-  if (toggleLabelsBtn) {
-    toggleLabelsBtn.addEventListener("click", () => {
-      symbolsHidden ? showSymbols() : hideSymbols();
-    });
+  /** Hide or show all symbol layers on the current map style. */
+  function setSymbolsHidden(hidden) {
+    const opacity = hidden ? 0 : 1;
+    const layers = map.getStyle()?.layers;
+    if (!Array.isArray(layers)) return;
+
+    for (const { id, type } of layers) {
+      if (type !== "symbol" || !map.getLayer(id)) continue;
+      try {
+        map.setPaintProperty(id, "text-opacity", opacity);
+      } catch {}
+      try {
+        map.setPaintProperty(id, "icon-opacity", opacity);
+      } catch {}
+    }
+
+    symbolsHidden = hidden;
+    if (toggleLabelsBtn) {
+      toggleLabelsBtn.textContent = hidden ? "Show Labels" : "Hide Labels";
+    }
   }
 
+  /** Build "all vs specific" checkbox behavior for a filter group. */
   function setupCheckboxGroup(groupName, allId) {
     const allBox = document.getElementById(allId);
-    const boxes = Array.from(document.querySelectorAll(`input[type="checkbox"][name="${groupName}"]`))
-      .filter((b) => b !== allBox);
-
     if (!allBox) return;
 
-    function setAllChecked() {
+    const boxes = [...document.querySelectorAll(`input[type="checkbox"][name="${groupName}"]`)]
+      .filter((box) => box !== allBox);
+
+    const setAllChecked = () => {
       allBox.checked = true;
-      boxes.forEach((b) => (b.checked = false));
-    }
+      boxes.forEach((box) => {
+        box.checked = false;
+      });
+    };
 
-    function ensureNotEmpty() {
-      const anySpecificChecked = boxes.some((b) => b.checked);
-      if (!anySpecificChecked) setAllChecked();
-    }
+    const ensureNotEmpty = () => {
+      if (!boxes.some((box) => box.checked)) setAllChecked();
+    };
 
-    allBox.addEventListener("change", () => {
+    on(allBox, "change", () => {
       if (allBox.checked) {
-        boxes.forEach((b) => (b.checked = false));
+        boxes.forEach((box) => {
+          box.checked = false;
+        });
       } else {
         ensureNotEmpty();
       }
     });
 
     boxes.forEach((box) => {
-      box.addEventListener("change", () => {
-        if (box.checked) {
-          allBox.checked = false;
-        }
+      on(box, "change", () => {
+        if (box.checked) allBox.checked = false;
         ensureNotEmpty();
       });
     });
@@ -252,102 +282,143 @@ document.addEventListener("DOMContentLoaded", () => {
     return setAllChecked;
   }
 
-  const resetMineralsToAll = setupCheckboxGroup("mineral", "mineral_all");
-  const resetUseCasesToAll = setupCheckboxGroup("useCase", "useCase_all");
+  /** Extract a readable country name and ISO2 code from a map feature. */
+  function getCountryFeatureInfo(feature) {
+    const props = feature?.properties || {};
+    return {
+      name: props.name_en || props.name || "Country",
+      iso2: (props.iso_3166_1 || "").toUpperCase()
+    };
+  }
 
-  map.on("load", () => {
-    map.addSource("countries", {
+  /** Build popup HTML for a clicked country. */
+  function buildCountryPopupHTML(name, iso2) {
+    return `
+      <strong>${name}</strong><br>
+      ISO: ${iso2 || "—"}<br>
+      <em>(Mineral stats placeholder)</em>
+    `;
+  }
+
+  /** Set the map cursor style for hover interactions. */
+  function setCursor(cursor = "") {
+    map.getCanvas().style.cursor = cursor;
+  }
+
+  /** Add all map data sources. */
+  function addSources() {
+    map.addSource(IDS.sources.countries, {
       type: "vector",
       url: "mapbox://mapbox.country-boundaries-v1"
     });
 
-    map.addSource("minerals", {
+    map.addSource(IDS.sources.minerals, {
       type: "geojson",
       data: "assets/deposit.geojson"
     });
+  }
 
+  /** Add the country outline and highlight layers. */
+  function addCountryLayers() {
     map.addLayer({
-      id: "country-outline",
+      id: IDS.layers.countryOutline,
       type: "line",
-      source: "countries",
+      source: IDS.sources.countries,
       "source-layer": "country_boundaries",
-      paint: { "line-color": "rgba(255,255,255,0.18)", "line-width": 0.9 },
-      filter: [
-        "all",
-        ["==", ["get", "disputed"], "false"],
-        [
-          "any",
-          ["==", "all", ["get", "worldview"]],
-          ["in", "US", ["get", "worldview"]]
-        ]
-      ]
+      paint: {
+        "line-color": "rgba(255,255,255,0.18)",
+        "line-width": 0.9
+      },
+      filter: COUNTRY_BASE_FILTER
     });
 
     map.addLayer({
-      id: "country-highlight",
+      id: IDS.layers.countryHighlight,
       type: "line",
-      source: "countries",
+      source: IDS.sources.countries,
       "source-layer": "country_boundaries",
-      paint: { "line-color": "#00ffff", "line-width": 3 },
+      paint: {
+        "line-color": "#00ffff",
+        "line-width": 3
+      },
       filter: ["==", ["get", "iso_3166_1"], ""]
     });
+  }
 
+  /** Add the mineral point layer. */
+  function addMineralLayer() {
     map.addLayer({
-      id: "mineral-points",
+      id: IDS.layers.mineralPoints,
       type: "circle",
-      source: "minerals",
+      source: IDS.sources.minerals,
       paint: {
         "circle-radius": 6,
         "circle-color": "#ffcc00",
         "circle-stroke-color": "#333",
         "circle-stroke-width": 1
       }
-    }); 
+    });
+  }
 
-    hideSymbols();
+  /** Bind all DOM/UI event listeners. */
+  function bindUIEvents() {
+    on(infoBtn, "click", () => scrollToEl(infoPage));
+    on(backBtn, "click", () => scrollToEl(app));
 
-    if (searchBtn) searchBtn.addEventListener("click", handleCountrySearch);
-    if (input) {
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") handleCountrySearch();
-      });
-    }
-    if (resetBtn) resetBtn.addEventListener("click", resetAll);
+    on(filterToggle, "click", () => togglePanel(filterPanel));
+    on(chartToggle, "click", () => togglePanel(chartPanel));
 
+    on(toggleLabelsBtn, "click", () => setSymbolsHidden(!symbolsHidden));
+
+    on(searchBtn, "click", handleCountrySearch);
+    on(resetBtn, "click", resetAll);
+
+    on(input, "keydown", (e) => {
+      if (e.key === "Enter") handleCountrySearch();
+    });
+  }
+
+  /** Bind all map-specific interaction listeners. */
+  function bindMapEvents() {
     map.on("click", (e) => {
       console.log(map.queryRenderedFeatures(e.point));
 
-      const features = map.queryRenderedFeatures(e.point, { layers: ["country-outline"] });
-      const f = features?.[0];
-      if (!f) return;
+      const features = map.queryRenderedFeatures(e.point, {
+        layers: [IDS.layers.countryOutline]
+      });
+      const feature = features?.[0];
+      if (!feature) return;
 
-      const name = f?.properties?.name_en || f?.properties?.name || "Country";
-      const iso2 = (f?.properties?.iso_3166_1 || "").toUpperCase();
+      const { name, iso2 } = getCountryFeatureInfo(feature);
 
       setSelectionUI({ name, iso2: iso2 || "—" });
       if (iso2) applyCountryHighlight(iso2);
 
       new mapboxgl.Popup({ closeOnClick: true, closeButton: true })
         .setLngLat(e.lngLat)
-        .setHTML(`<strong>${name}</strong><br>ISO: ${iso2 || "—"}<br><em>(Mineral stats placeholder)</em>`)
+        .setHTML(buildCountryPopupHTML(name, iso2))
         .addTo(map);
     });
 
-    function filterMineralsByCountry() {
-      const filter = iso2
-        ? ["==", ["get", "country_iso2"], iso2.toUpperCase()]
-        : ["has", "country_iso2"];
-      map.setFilter("mineral-points", filter);
-    }
+    map.on("mouseenter", IDS.layers.countryOutline, () => setCursor("pointer"));
+    map.on("mouseleave", IDS.layers.countryOutline, () => setCursor(""));
+  }
 
-    map.on("mouseenter", "country-outline", () => (map.getCanvas().style.cursor = "pointer"));
-    map.on("mouseleave", "country-outline", () => (map.getCanvas().style.cursor = ""));
+  const resetMineralsToAll = setupCheckboxGroup("mineral", "mineral_all");
+  const resetUseCasesToAll = setupCheckboxGroup("useCase", "useCase_all");
 
+  map.on("load", () => {
+    addSources();
+    addCountryLayers();
+    addMineralLayer();
+    bindUIEvents();
+    bindMapEvents();
+
+    setSymbolsHidden(true);
     setToggleGlyphs();
     resetAll();
   });
 });
-
 
 function createChart(data,filterType) {
 
