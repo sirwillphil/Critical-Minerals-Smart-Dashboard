@@ -432,9 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setSelectionUI({ name, iso2: iso2 || "—" });
       if (iso2) applyCountryHighlight(iso2);
 
-      const countryFiltered = allMineralData.filter(f =>
-        f.country?.toLowerCase() === name.toLowerCase()
-      );
+      renderCharts(allMineralData);
 
       new mapboxgl.Popup({ closeOnClick: true, closeButton: true })
         .setLngLat(e.lngLat)
