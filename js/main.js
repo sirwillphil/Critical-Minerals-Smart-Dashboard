@@ -38,6 +38,7 @@ const COUNTRY_BASE_FILTER = [
 let selectedCountry = null;
 let allMineralData = [];
 let popup = null;
+let hoverpopup = null;
 
 const useCases = {
   batteries: { label: "Batteries", minerals: ["Lithium", "Nickel", "Cobalt", "Graphite", "Manganese", "Vanadium", "Lead", "Fluorine", "Fluorite", "Phosphorus"] },
@@ -513,6 +514,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
     map.on("mouseenter", IDS.layers.countryFill, () => setCursor("pointer"));
     map.on("mouseleave", IDS.layers.countryFill, () => setCursor(""));
+
+    // HOVER for mineral points
+    map.on("mouseenter", IDS.layers.mineralPoints, (e) => {
+
+      const feature = e.features?.[0];
+      if (!feature) return;
+
+      const props = feature.properties || {};
+
+      const site = props.dep_name || "Unknown Site";
+      const mineralsRaw = props.commodity || "";
+
+      const mineralList = mineralsRaw
+        .split(",")
+        .map(m => m.trim().toLowerCase())
+        .filter(Boolean);
+
+      const matchedUseCases = [];
+
+      Object.values(useCases).forEach(uc => {
+        const match = (uc.minerals || []).some(m =>
+          mineralList.includes(m.toLowerCase())
+        );
+        if (match) matchedUseCases.push(uc.label);
+      });
+
+      const html = `
+        <strong>${escapeHtml(site)}</strong><br>
+        <strong>Minerals:</strong> ${escapeHtml(mineralsRaw) || "—"}<br>
+        <strong>Use Cases:</strong> ${
+          matchedUseCases.length ? matchedUseCases.join(", ") : "—"
+        }
+      `;
+
+      if (hoverpopup) hoverpopup.remove();
+
+      hoverpopup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+      })
+        .setLngLat(e.lngLat)
+        .setHTML(html)
+        .addTo(map);
+
+    });
+
+    map.on("mouseleave", IDS.layers.mineralPoints, () => {
+      if (hoverpopup) hoverpopup.remove();
+    });
   }
 
   const resetMineralsToAll = setupCheckboxGroup("mineral", "mineral_all");
