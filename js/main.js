@@ -34,8 +34,8 @@ const COUNTRY_BASE_FILTER = [
   ]
 ];
 
-selectedCountry = null;
-allMineralData = [];
+let selectedCountry = null;
+let allMineralData = [];
 
 const useCases = {
   batteries: { label: "Batteries", minerals: ["Lithium", "Nickel", "Cobalt", "Graphite", "Manganese", "Vanadium", "Lead", "Fluorine", "Fluorite", "Phosphorus"] },
