@@ -18,6 +18,7 @@ const IDS = {
     minerals: "minerals"
   },
   layers: {
+    countryFill: "country-fill",
     countryOutline: "country-outline",
     countryHighlight: "country-highlight",
     mineralPoints: "mineral-points"
@@ -103,6 +104,21 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   let symbolsHidden = false;
+
+  /** Add the invisible country fill layer used for polygon clicks. */
+  function addCountryFillLayer() {
+    map.addLayer({
+      id: IDS.layers.countryFill,
+      type: "fill",
+      source: IDS.sources.countries,
+      "source-layer": "country_boundaries",
+      paint: {
+        "fill-color": "#ffffff",
+        "fill-opacity": 0
+      },
+      filter: COUNTRY_BASE_FILTER
+    });
+  }
 
   /** Update the selected country text in the side panel. */
   function setSelectionUI({ name = "—", iso2 = "—" } = {}) {
@@ -327,12 +343,62 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  /** Build popup HTML for a clicked country. */
-  function buildCountryPopupHTML(name, iso2) {
+    /** Escape text for safe HTML output. */
+  function escapeHtml(str) {
+    return String(str ?? "").replace(/[&<>"']/g, (ch) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[ch]));
+  }
+
+  /** Return a deduplicated list from a comma-separated field. */
+  function getUniqueValuesFromField(data, field) {
+    const values = new Set();
+
+    data.forEach(d => {
+      const raw = d[field];
+      if (!raw) return;
+
+      String(raw)
+        .split(",")
+        .map(s => s.trim())
+        .filter(Boolean)
+        .forEach(v => values.add(v));
+    });
+
+    return [...values].sort((a, b) => a.localeCompare(b));
+  }
+
+  /** Return deduplicated use case labels from the minerals in the filtered data. */
+  function getUseCasesFromData(data) {
+    const minerals = new Set(
+      getUniqueValuesFromField(data, "commodity").map(m => m.toLowerCase())
+    );
+
+    const matched = [];
+
+    Object.values(useCases).forEach(uc => {
+      const hasMatch = (uc.minerals || []).some(m => minerals.has(m.toLowerCase()));
+      if (hasMatch) matched.push(uc.label);
+    });
+
+    return [...new Set(matched)].sort((a, b) => a.localeCompare(b));
+  }
+
+  /** Build popup HTML for a clicked country using the currently filtered data. */
+  function buildCountryPopupHTML(name, iso2, data) {
+    const minerals = getUniqueValuesFromField(data, "commodity");
+    const useCaseList = getUseCasesFromData(data);
+
     return `
-      <strong>${name}</strong><br>
-      ISO: ${iso2 || "—"}<br>
-      <em>(Mineral stats placeholder)</em>
+      <strong>${escapeHtml(name)}</strong><br>
+      <strong>Sites:</strong> ${data.length}<br>
+      <strong>Minerals:</strong> ${minerals.length ? minerals.map(escapeHtml).join(", ") : "—"}<br>
+      <strong>Use Cases:</strong> ${useCaseList.length ? useCaseList.map(escapeHtml).join(", ") : "—"}<br>
+      <em style="font-size:11px;color:#aaa;">Values reflect currently active filters.</em>
     `;
   }
 
@@ -420,7 +486,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log(map.queryRenderedFeatures(e.point));
 
       const features = map.queryRenderedFeatures(e.point, {
-        layers: [IDS.layers.countryOutline]
+        layers: [IDS.layers.countryFill]
       });
       const feature = features?.[0];
       if (!feature) return;
@@ -432,16 +498,16 @@ document.addEventListener("DOMContentLoaded", () => {
       setSelectionUI({ name, iso2: iso2 || "—" });
       if (iso2) applyCountryHighlight(iso2);
 
-      renderCharts(allMineralData);
+      const filteredData = renderCharts(allMineralData);
 
       new mapboxgl.Popup({ closeOnClick: true, closeButton: true })
         .setLngLat(e.lngLat)
-        .setHTML(buildCountryPopupHTML(name, iso2))
+        .setHTML(buildCountryPopupHTML(name, iso2, filteredData))
         .addTo(map);
     });
 
-    map.on("mouseenter", IDS.layers.countryOutline, () => setCursor("pointer"));
-    map.on("mouseleave", IDS.layers.countryOutline, () => setCursor(""));
+    map.on("mouseenter", IDS.layers.countryFill, () => setCursor("pointer"));
+    map.on("mouseleave", IDS.layers.countryFill, () => setCursor(""));
   }
 
   const resetMineralsToAll = setupCheckboxGroup("mineral", "mineral_all");
@@ -449,6 +515,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   map.on("load", () => {
     addSources();
+    addCountryFillLayer();
     addCountryLayers();
     addMineralLayer();
     bindUIEvents();
@@ -457,12 +524,13 @@ document.addEventListener("DOMContentLoaded", () => {
     setSymbolsHidden(true);
     setToggleGlyphs();
     resetAll();
+
     fetch("assets/deposit-cleaned.geojson")
-    .then(res => res.json())
-    .then(geojson => {
-      allMineralData = geojson.features.map(f => f.properties);
-      renderCharts(allMineralData);
-    });
+      .then(res => res.json())
+      .then(geojson => {
+        allMineralData = geojson.features.map(f => f.properties);
+        renderCharts(allMineralData);
+      });
   });
 
   function getActiveCheckboxValues(name, allId){
@@ -573,6 +641,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("mapFilter:", JSON.stringify(mapFilter));
     map.setFilter(IDS.layers.mineralPoints, mapFilter);
     createChart(filtered, filterType);
+    return filtered;
   }
 
   function createChart(data, filterType) {
