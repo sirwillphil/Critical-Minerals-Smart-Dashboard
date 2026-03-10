@@ -37,6 +37,7 @@ const COUNTRY_BASE_FILTER = [
 
 let selectedCountry = null;
 let allMineralData = [];
+let popup = null;
 
 const useCases = {
   batteries: { label: "Batteries", minerals: ["Lithium", "Nickel", "Cobalt", "Graphite", "Manganese", "Vanadium", "Lead", "Fluorine", "Fluorite", "Phosphorus"] },
@@ -204,6 +205,8 @@ document.addEventListener("DOMContentLoaded", () => {
     setSelectionUI({ name, iso2: iso2 || "—" });
     if (iso2) applyCountryHighlight(iso2);
 
+    if (popup) popup.remove();
+
     selectedCountry = name;
     renderCharts(allMineralData);
   }
@@ -233,6 +236,8 @@ document.addEventListener("DOMContentLoaded", () => {
     map.setFilter(IDS.layers.mineralPoints, null);
 
     selectedCountry = null;
+
+    if (popup) popup.remove();
 
     map.flyTo({
       ...DEFAULT_VIEW,
@@ -500,7 +505,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const filteredData = renderCharts(allMineralData);
 
-      new mapboxgl.Popup({ closeOnClick: true, closeButton: true })
+      popup = new mapboxgl.Popup({ closeOnClick: true, closeButton: true })
         .setLngLat(e.lngLat)
         .setHTML(buildCountryPopupHTML(name, iso2, filteredData))
         .addTo(map);
