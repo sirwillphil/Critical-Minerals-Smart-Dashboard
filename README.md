@@ -1,6 +1,6 @@
 # Critical Minerals Smart Dashboard
 
-![Dashboard Screenshot](Screenshot%202026-03-10%20194912.png)
+![Dashboard Screenshot](assets/dashboard-screenshot.png)
 
 ## Live Dashboard
 
@@ -12,8 +12,11 @@ https://sirwillphil.github.io/Critical-Minerals-Smart-Dashboard/
 ## Authors
 
 Kenneth Ha
+
 Will Seneko
+
 Evan Luong
+
 Li-An Song
 
 ---
