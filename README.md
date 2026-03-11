@@ -129,4 +129,4 @@ Critical-Minerals-Smart-Dashboard
 
 ## Acknowledgements
 
-This project was developed as part of a geospatial data visualization and analytics coursework project.
+This project was developed as part of a geospatial data visualization and analytics coursework project for GEOG458.
