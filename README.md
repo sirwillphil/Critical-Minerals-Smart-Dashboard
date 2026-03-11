@@ -114,7 +114,7 @@ By combining geospatial mapping with interactive charts and filtering tools, the
 ---
 ## Data Sources
 
-Link: (USGS)[https://mrdata.usgs.gov/pp1802/]
+Link: [USGS](https://mrdata.usgs.gov/pp1802/)
 
 This projects data source comes from the USGS Mineral Resources database.
 Specifically it is the "Global distribution of selected mines, deposits, and districts of critical minerals" dataset.
