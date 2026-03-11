@@ -112,6 +112,16 @@ By combining geospatial mapping with interactive charts and filtering tools, the
 * GeoJSON Data
 
 ---
+## Data Sources
+
+Link: (USGS)[https://mrdata.usgs.gov/pp1802/]
+
+This projects data source comes from the USGS Mineral Resources database.
+Specifically it is the "Global distribution of selected mines, deposits, and districts of critical minerals" dataset.
+It has been cleaned using mapshaper.org to convert the original shapefile into a GeoJSON format. We then had to do some
+additional cleaning to standardize the mineral atriubute of the dataset.
+
+---
 
 ## Repository Structure
 
