@@ -489,7 +489,6 @@ document.addEventListener("DOMContentLoaded", () => {
   /** Bind all map-specific interaction listeners. */
   function bindMapEvents() {
     map.on("click", (e) => {
-      console.log(map.queryRenderedFeatures(e.point));
 
       const features = map.queryRenderedFeatures(e.point, {
         layers: [IDS.layers.countryFill]
@@ -590,7 +589,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getActiveCheckboxValues(name, allId){
     const allBox = document.getElementById(allId);
-    console.log(`Checking active checkboxes for ${name}, allId: ${allId}, allBox checked: ${allBox?.checked}`);
     if (allBox?.checked) return null;
 
     const boxes = [...document.querySelectorAll(`input[type="checkbox"][name="${name}"]`)]
@@ -693,7 +691,6 @@ document.addEventListener("DOMContentLoaded", () => {
       : mapFilters.length === 1 ? mapFilters[0]
       : ["all", ...mapFilters];
 
-    console.log("mapFilter:", JSON.stringify(mapFilter));
     map.setFilter(IDS.layers.mineralPoints, mapFilter);
     createChart(filtered, filterType);
     return filtered;
@@ -710,7 +707,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } else if (filterType === "commodity") {
       plotPie("chartOne", countByField(data, "country"), "Country Breakdown for Mineral");
-      plotBar("chartTwo", countByField(data, "dep_type"), "Deposit Type Breakdown");
+      plotPie("chartTwo", countByField(data, "dep_type"), "Deposit Type Breakdown");
 
     } else {
       plotPie("chartOne", countByField(data, "commodity"), "Top 10 Mineral Breakdown");
