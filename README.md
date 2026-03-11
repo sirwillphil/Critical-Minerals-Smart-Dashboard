@@ -13,7 +13,7 @@ https://sirwillphil.github.io/Critical-Minerals-Smart-Dashboard/
 
 ## Authors
 
-Will Seneko
+Will Senenko
 
 Kenneth Ha
 
@@ -107,9 +107,8 @@ By combining geospatial mapping with interactive charts and filtering tools, the
 * HTML
 * CSS
 * JavaScript
-* Leaflet.js
-* Mapbox Basemap
-* Chart.js
+* Mapbox GL JS
+* Plotly JS
 * GeoJSON Data
 
 ---
