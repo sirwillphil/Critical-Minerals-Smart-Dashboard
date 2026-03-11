@@ -1,6 +1,8 @@
 # Critical Minerals Smart Dashboard
 
-![Dashboard Screenshot](assets/dashboard-screenshot.png)
+<p align="center">
+  <img src="assets/dashboard-screenshot.png" width="950">
+</p>
 
 ## Live Dashboard
 
@@ -12,35 +14,32 @@ https://sirwillphil.github.io/Critical-Minerals-Smart-Dashboard/
 ## Authors
 
 Kenneth Ha
-
 Will Seneko
-
 Evan Luong
-
 Li-An Song
 
 ---
 
 ## Project Overview
 
-The **Critical Minerals Smart Dashboard** is an interactive geospatial visualization tool that explores the global distribution of critical mineral deposits. These minerals are essential to modern technology and play a major role in industries such as renewable energy, electric vehicles, electronics, and aerospace manufacturing.
+The **Critical Minerals Smart Dashboard** is an interactive geospatial visualization tool designed to explore the global distribution of critical mineral deposits. These minerals are essential to modern technologies and play an important role in industries such as renewable energy, electric vehicles, electronics, and aerospace manufacturing.
 
-This dashboard allows users to explore where key mineral resources are located around the world and understand their importance in global supply chains and emerging technologies.
+The dashboard allows users to interactively explore where mineral deposits are located around the world and better understand how these resources support global supply chains and technological development.
 
 ---
 
-## Features
+## Dashboard Features
 
 ### Interactive Global Map
 
-* Displays mineral deposit locations across the world
-* Built using Leaflet with a Mapbox basemap
+* Displays hundreds of mineral deposit locations worldwide
+* Built using **Leaflet** with a Mapbox basemap
 * Users can zoom, pan, and explore spatial patterns of deposits
 
 ### Country Search
 
 * Search for a specific country
-* Highlights mineral deposits associated with that location
+* Highlights mineral deposits associated with that country
 
 ### Mineral Filters
 
@@ -64,7 +63,7 @@ Users can explore minerals used in:
 
 ### Dynamic Charts
 
-The dashboard includes two interactive charts:
+The dashboard includes two charts that summarize mineral data:
 
 **Top 10 Mineral Breakdown**
 
@@ -72,7 +71,7 @@ The dashboard includes two interactive charts:
 
 **Top 10 Countries by Site Count**
 
-* Bar chart showing which countries have the highest number of mineral sites
+* Bar chart showing countries with the highest number of mineral deposits
 
 ### Map Controls
 
@@ -84,31 +83,31 @@ The dashboard includes two interactive charts:
 
 ## How to Use the Dashboard
 
-1. Open the live dashboard using the link above.
-2. Explore mineral deposits on the global map.
-3. Use the **Search by Country** tool to focus on a specific country.
-4. Apply mineral and industry filters to refine the dataset.
+1. Open the live dashboard.
+2. Explore mineral deposit locations on the global map.
+3. Use the **Search by Country** feature to focus on a specific region.
+4. Apply filters to explore mineral types and industry uses.
 5. View the charts to analyze mineral distribution patterns.
 
 ---
 
 ## Project Goal
 
-The goal of this project is to create an intuitive visualization tool that helps users understand the geographic distribution of critical minerals and their importance in global energy transitions, manufacturing, and technology development.
+The goal of this project is to create an intuitive visualization tool that helps users understand the geographic distribution of critical minerals and their importance in global energy systems, manufacturing, and emerging technologies.
 
-By combining geospatial mapping with dynamic charts and filters, the dashboard provides insights into how mineral resources are distributed and how they support modern industries.
+By combining geospatial mapping with interactive charts and filtering tools, the dashboard provides insights into how mineral resources are distributed across the world.
 
 ---
 
 ## Technologies Used
 
-HTML
-CSS
-JavaScript
-Leaflet.js
-Mapbox Basemap
-Chart.js
-GeoJSON Data
+* HTML
+* CSS
+* JavaScript
+* Leaflet.js
+* Mapbox Basemap
+* Chart.js
+* GeoJSON Data
 
 ---
 
@@ -118,15 +117,18 @@ GeoJSON Data
 Critical-Minerals-Smart-Dashboard
 │
 ├── index.html
+├── map1.html
+├── map2.html
+├── charts.html
 ├── css/
 ├── js/
-├── data/
-├── Screenshot 2026-03-10 194912.png
-└── README.md
+├── assets/
+├── README.md
+└── .DS_Store
 ```
 
 ---
 
 ## Acknowledgements
 
-This project was developed as part of a geospatial data visualization and analytics coursework project for GEOG458.
+This project was developed as part of a geospatial data visualization and analytics coursework project.
