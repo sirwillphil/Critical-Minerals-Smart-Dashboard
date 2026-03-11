@@ -13,9 +13,12 @@ https://sirwillphil.github.io/Critical-Minerals-Smart-Dashboard/
 
 ## Authors
 
-Kenneth Ha
 Will Seneko
+
+Kenneth Ha
+
 Evan Luong
+
 Li-An Song
 
 ---
@@ -131,4 +134,4 @@ Critical-Minerals-Smart-Dashboard
 
 ## Acknowledgements
 
-This project was developed as part of a geospatial data visualization and analytics coursework project.
+This project was developed as part of a geospatial data visualization and analytics coursework project for GEOG458.
