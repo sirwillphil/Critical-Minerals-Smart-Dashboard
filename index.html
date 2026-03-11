@@ -18,6 +18,11 @@
 
     <div id="mapDiv"></div>
 
+    <div id="titleContainer">
+      <h1>Critical Minerals Smart Dashboard</h1>
+      <p>The minerals shaping technology, trade, and energy policy</p>
+    </div>
+
     <button id="filterToggle" class="panel-toggle panel-toggle-left" title="Hide/Show Filters">◀</button>
     <button id="chartToggle" class="panel-toggle panel-toggle-right" title="Hide/Show Charts">▶</button>
 
@@ -109,6 +114,8 @@
       <div class="stats">
         <div><strong>Selected country:</strong> <span id="statCountry">-</span></div>
         <div><strong>ISO code:</strong> <span id="statISO">-</span></div>
+        <br>
+        <button id="toggleLabels" class="side-btn">Toggle Labels</button>
       </div>
     </aside>
 
@@ -118,8 +125,6 @@
       <div class="chartPlaceholder" id="chartOne"></div>
       <div class="chartPlaceholder" id="chartTwo"></div>
     </aside>
-
-    <button id="toggleLabels" class="floating-btn">Toggle Labels</button>
 
     <button id="infoJumpBtn" class="info-jump" title="More information">
       More Information ↓
