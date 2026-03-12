@@ -1,7 +1,7 @@
 # Critical Minerals Smart Dashboard
 
 <p align="center">
-  <img src="assets/dashboard-screenshot.png" width="950">
+  <img src="img/dashboard-screenshot.png" width="950">
 </p>
 
 ## Live Dashboard
