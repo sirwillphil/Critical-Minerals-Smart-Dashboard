@@ -621,7 +621,8 @@ document.addEventListener("DOMContentLoaded", () => {
       type: "pie",
       textinfo: "percent",
       hoverinfo: "label+value+percent"
-    }], {title: { text: title }, autosize: true, margin: { l: 50, r: 30, t: 50, b: 50 } },
+    }], {font: {color: 'white'}, title: { text: title},plot_bgcolor: '#3f3f3f',
+        paper_bgcolor: '#3f3f3f', autosize: true, margin: { l: 50, r: 30, t: 50, b: 50 } },
     { responsive: true }
     );
   }
@@ -633,7 +634,8 @@ document.addEventListener("DOMContentLoaded", () => {
       x: top.map(d => d[0]),
       y: top.map(d => d[1]),
       type: "bar"
-    }], {title: { text: title }, autosize: true, margin: { l: 40, r: 20, t: 50, b: 50 } });
+    }], {font: {color: 'white'},title: { text: title}, plot_bgcolor: '#3f3f3f',
+      paper_bgcolor: '#3f3f3f', autosize: true, margin: { l: 40, r: 20, t: 50, b: 50 } });
   }
 
   function renderCharts(allFeatures) {
