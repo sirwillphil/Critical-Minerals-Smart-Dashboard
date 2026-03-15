@@ -1,5 +1,7 @@
 # Critical Minerals Smart Dashboard
 
+We used AI in this assignment for debugging only. We did not use AI to write or complete any components where AI use is prohibited. We are able to explain all relevant code and design decisions used in this project.
+
 <p align="center">
   <img src="img/dashboard-screenshot.png" width="950">
 </p>
