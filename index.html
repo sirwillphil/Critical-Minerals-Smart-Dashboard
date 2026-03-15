@@ -126,163 +126,219 @@
       <div class="chartPlaceholder" id="chartTwo"></div>
     </aside>
 
-    <button id="infoJumpBtn" class="info-jump" title="More information">
-      More Information ↓
+    <button id="infoJumpBtn" class="info-jump" title="About Us">
+      About Us ↓
     </button>
 
   </div>
 
-<section id="infoPage">
-  <div class="infoWrap">
-    <div class="infoHeaderRow">
-      <h2>More Information</h2>
-      <button id="backToMapBtn" class="back-btn">Back to Map ↑</button>
-    </div>
+  <section id="infoPage">
+    <div class="infoWrap">
+      <div class="infoHeaderRow">
+        <h2>About Us</h2>
+        <button id="backToMapBtn" class="back-btn">Back to Map ↑</button>
+      </div>
 
-    <div class="infoSection">
-      <h3>About This Dashboard</h3>
-      <p>
-        This dashboard visualizes the global distribution of critical mineral deposits and
-        connects those deposits to major modern use cases, including batteries, electric
-        vehicles, grid infrastructure, renewable energy, electronics, aerospace, magnets,
-        catalysts, and other advanced industrial applications. Rather than treating mineral
-        geography as an isolated mining topic, the project frames these resources as part of
-        a larger system linking geology, technology, industrial strategy, and geopolitics.
-      </p>
-      <p>
-        The dashboard is especially relevant because critical minerals have become a major
-        international policy issue. The International Energy Agency has emphasized that
-        minerals such as copper, lithium, nickel, cobalt, graphite, and rare earth elements
-        are now central to energy technologies and broader industrial competitiveness, while
-        supply chains remain vulnerable to bottlenecks, price swings, and geopolitical risk.
-        In 2025 and early 2026, critical minerals were not only discussed in energy reports,
-        but also in trade policy, national security, and multilateral diplomacy.
-      </p>
-      <p>
-        This project is therefore designed as an exploratory educational tool. It helps users
-        see where important minerals are located, how those locations relate to specific
-        technologies, and why certain countries appear repeatedly in conversations about
-        supply-chain resilience, industrial policy, and the clean energy transition.
-      </p>
-    </div>
+      <div class="infoSection">
+        <h3>About This Dashboard</h3>
+        <p>
+          This dashboard visualizes the global distribution of critical mineral deposits and
+          connects those deposits to major modern use cases, including batteries, electric
+          vehicles, grid infrastructure, renewable energy, electronics, aerospace, magnets,
+          catalysts, and other advanced industrial applications. Rather than treating mineral
+          geography as an isolated mining topic, the project frames these resources as part of
+          a larger system linking geology, technology, industrial strategy, and geopolitics.
+        </p>
+        <p>
+          The dashboard is especially relevant because critical minerals have become a major
+          international policy issue. The International Energy Agency has emphasized that
+          minerals such as copper, lithium, nickel, cobalt, graphite, and rare earth elements
+          are now central to energy technologies and broader industrial competitiveness, while
+          supply chains remain vulnerable to bottlenecks, price swings, and geopolitical risk.
+          In 2025 and early 2026, critical minerals were not only discussed in energy reports,
+          but also in trade policy, national security, and multilateral diplomacy.
+        </p>
+        <p>
+          This project is therefore designed as an exploratory educational tool. It helps users
+          see where important minerals are located, how those locations relate to specific
+          technologies, and why certain countries appear repeatedly in conversations about
+          supply-chain resilience, industrial policy, and the clean energy transition.
+        </p>
+      </div>
 
-    <div class="infoSection">
-      <h3>How to Use It</h3>
-      <p>
-        Users can interact with the dashboard in several ways. A country search allows the
-        map to zoom to a selected country, while the mineral filter narrows the visible
-        deposits to a specific resource. Use-case filters connect minerals to downstream
-        technologies such as EVs, solar, hydrogen, aerospace, and electronics, making it
-        easier to understand that one mineral can matter to several industries at once.
-      </p>
-      <p>
-        The charts respond to the current map view and the active filters, so the dashboard
-        is meant to be read dynamically rather than as a static map. In practice, that means
-        the story changes depending on what the user selects: zooming into one country,
-        switching to a single mineral, or focusing on a specific industrial use case can all
-        produce a different picture of concentration and dependency.
-      </p>
-      <p>
-        Users should also keep in mind what the dashboard does and does not show. It is best
-        understood as a deposit- and use-case-oriented overview, not a full model of the
-        entire supply chain. A country may have important mineral deposits without dominating
-        processing, refining, manufacturing, or recycling. That distinction matters because
-        recent research shows that refining and processing remain highly concentrated even
-        when mining becomes more geographically diversified. The IEA projects that by 2035,
-        China is still set to supply over 60% of refined lithium and cobalt and around 80%
-        of battery-grade graphite and rare earth elements. 
-        <a href="https://www.iea.org/reports/global-critical-minerals-outlook-2025/overview-of-outlook-for-key-minerals">Source</a>
-      </p>
-    </div>
+      <div class="infoSection">
+        <h3>How to Use It</h3>
+        <p>
+          Users can interact with the dashboard in several ways. A country search allows the
+          map to zoom to a selected country, while the mineral filter narrows the visible
+          deposits to a specific resource. Use-case filters connect minerals to downstream
+          technologies such as EVs, solar, hydrogen, aerospace, and electronics, making it
+          easier to understand that one mineral can matter to several industries at once.
+        </p>
+        <p>
+          The charts respond to the current map view and the active filters, so the dashboard
+          is meant to be read dynamically rather than as a static map. In practice, that means
+          the story changes depending on what the user selects: zooming into one country,
+          switching to a single mineral, or focusing on a specific industrial use case can all
+          produce a different picture of concentration and dependency.
+        </p>
+        <p>
+          Users should also keep in mind what the dashboard does and does not show. It is best
+          understood as a deposit- and use-case-oriented overview, not a full model of the
+          entire supply chain. A country may have important mineral deposits without dominating
+          processing, refining, manufacturing, or recycling. That distinction matters because
+          recent research shows that refining and processing remain highly concentrated even
+          when mining becomes more geographically diversified. The IEA projects that by 2035,
+          China is still set to supply over 60% of refined lithium and cobalt and around 80%
+          of battery-grade graphite and rare earth elements.
+          <a href="https://www.iea.org/reports/global-critical-minerals-outlook-2025/overview-of-outlook-for-key-minerals">Source</a>
+        </p>
+      </div>
 
-    <div class="infoSection">
-      <h3>Why Critical Minerals Matter</h3>
-      <p>
-        Critical minerals matter because they are foundational inputs for the technologies
-        that increasingly shape both everyday life and long-term economic transformation.
-        Lithium, nickel, cobalt, graphite, manganese, and copper support battery systems and
-        electric vehicles. Rare earth elements are essential for high-performance magnets used
-        in motors, wind turbines, and defense applications. Silver and tellurium are important
-        for solar technologies, while titanium, tungsten, niobium, and related materials have
-        strategic uses in aerospace and advanced manufacturing.
-      </p>
-      <p>
-        Their importance is not only technological but also strategic. The European Union's
-        Critical Raw Materials Act explicitly links these materials to renewable energy,
-        digital industries, aerospace, and defence, and sets 2030 benchmarks for extraction,
-        processing, recycling, and diversification in order to reduce dependence on any single
-        foreign supplier. In the United States, the final 2025 critical minerals list added
-        ten more materials, including copper, silver, uranium, phosphate, potash, boron, and
-        silicon, reflecting how broadly these resources now matter for economic security and
-        national resilience.
-        <a href="https://single-market-economy.ec.europa.eu/sectors/raw-materials/areas-specific-interest/critical-raw-materials/critical-raw-materials-act_en">Source 1,</a> 
-        <a href="https://www.usgs.gov/news/science-snippet/interior-department-releases-final-2025-list-critical-minerals">Source 2</a>
-      </p>
-      <p>
-        Recent events have made these vulnerabilities more visible. In 2025, China announced
-        additional export controls affecting rare earth elements and related products, and the
-        IEA warned that such controls could disrupt sectors including energy, automotive,
-        defence, semiconductors, aerospace, industrial motors, and AI data centers. In March
-        2026, critical minerals were important enough to be discussed at the UN Security
-        Council, where officials described them as central to both the energy transition and
-        the digital economy.
-        <a href="https://www.iea.org/commentaries/with-new-export-controls-on-critical-minerals-supply-concentration-risks-become-reality">Source 1,</a> 
-        <a href="https://apnews.com/article/un-energy-critical-minerals-technology-c86cc38b886f6d74f508fcc703f8fa01">Source 2</a> 
-      </p>
-      <p>
-        At the same time, the issue is not only about scarcity. It is also about who captures
-        value. UN Trade and Development has noted that Africa accounts for about 12% of global
-        mineral exports but captures only about 4% of the value in green supply chains,
-        showing that extraction alone does not guarantee equitable development. This is one
-        reason why current debates increasingly focus on refining, local value addition,
-        recycling, and responsible governance rather than mining alone.
-        <a href="https://unctad.org/publication/sdg-pulse-2025">Source</a>
-      </p>
-    </div>
+      <div class="infoSection">
+        <h3>Why Critical Minerals Matter</h3>
+        <p>
+          Critical minerals matter because they are foundational inputs for the technologies
+          that increasingly shape both everyday life and long-term economic transformation.
+          Lithium, nickel, cobalt, graphite, manganese, and copper support battery systems and
+          electric vehicles. Rare earth elements are essential for high-performance magnets used
+          in motors, wind turbines, and defense applications. Silver and tellurium are important
+          for solar technologies, while titanium, tungsten, niobium, and related materials have
+          strategic uses in aerospace and advanced manufacturing.
+        </p>
+        <p>
+          Their importance is not only technological but also strategic. The European Union's
+          Critical Raw Materials Act explicitly links these materials to renewable energy,
+          digital industries, aerospace, and defence, and sets 2030 benchmarks for extraction,
+          processing, recycling, and diversification in order to reduce dependence on any single
+          foreign supplier. In the United States, the final 2025 critical minerals list added
+          ten more materials, including copper, silver, uranium, phosphate, potash, boron, and
+          silicon, reflecting how broadly these resources now matter for economic security and
+          national resilience.
+          <a href="https://single-market-economy.ec.europa.eu/sectors/raw-materials/areas-specific-interest/critical-raw-materials/critical-raw-materials-act_en">Source 1,</a>
+          <a href="https://www.usgs.gov/news/science-snippet/interior-department-releases-final-2025-list-critical-minerals">Source 2</a>
+        </p>
+        <p>
+          Recent events have made these vulnerabilities more visible. In 2025, China announced
+          additional export controls affecting rare earth elements and related products, and the
+          IEA warned that such controls could disrupt sectors including energy, automotive,
+          defence, semiconductors, aerospace, industrial motors, and AI data centers. In March
+          2026, critical minerals were important enough to be discussed at the UN Security
+          Council, where officials described them as central to both the energy transition and
+          the digital economy.
+          <a href="https://www.iea.org/commentaries/with-new-export-controls-on-critical-minerals-supply-concentration-risks-become-reality">Source 1,</a>
+          <a href="https://apnews.com/article/un-energy-critical-minerals-technology-c86cc38b886f6d74f508fcc703f8fa01">Source 2</a>
+        </p>
+        <p>
+          At the same time, the issue is not only about scarcity. It is also about who captures
+          value. UN Trade and Development has noted that Africa accounts for about 12% of global
+          mineral exports but captures only about 4% of the value in green supply chains,
+          showing that extraction alone does not guarantee equitable development. This is one
+          reason why current debates increasingly focus on refining, local value addition,
+          recycling, and responsible governance rather than mining alone.
+          <a href="https://unctad.org/publication/sdg-pulse-2025">Source</a>
+        </p>
+      </div>
 
-    <div class="infoSection">
-      <h3>Project Goal</h3>
-      <p>
-        The goal of this project is to make critical mineral systems easier to understand
-        through an interactive geographic interface. Instead of reading separate reports on
-        mining, energy policy, industrial supply chains, and geopolitical risk, users can
-        explore how these themes intersect spatially. The dashboard is meant to help answer
-        questions such as: Which countries are associated with which minerals? Which minerals
-        support multiple technologies? Where might supply concentration create vulnerability?
-      </p>
-      <p>
-        A second goal is to highlight that the clean energy transition is also a materials
-        transition. The shift to electric mobility, renewable power, grid expansion, and
-        advanced electronics depends not just on innovation in devices, but on reliable access
-        to the minerals inside them. The IEA's 2025 outlook notes that demand and supply for
-        these materials are now central to long-term planning, while recent policy actions by
-        the EU, the U.S., and allied countries show that governments increasingly treat
-        mineral supply chains as strategic infrastructure. Just last week, Canada and
-        Australia announced new critical-minerals agreements tied to the G7 production
-        alliance, underscoring how quickly this issue is moving from resource policy into
-        broader geopolitical coordination.
-        <a href="https://www.reuters.com/world/americas/australia-canada-sign-new-deals-critical-minerals-2026-03-05/">Source</a>
-      </p>
-      <p>
-        Ultimately, this dashboard aims to support informed public understanding. It invites
-        users to think beyond a single mine or a single commodity and instead view critical
-        minerals as part of a global network of extraction, processing, trade, technology,
-        and power. In that sense, the project is not only about where minerals are found, but
-        about why those locations matter in the first place.
-      </p>
-    </div>
+      <div class="infoSection">
+        <h3>Project Goal</h3>
+        <p>
+          The goal of this project is to make critical mineral systems easier to understand
+          through an interactive geographic interface. Instead of reading separate reports on
+          mining, energy policy, industrial supply chains, and geopolitical risk, users can
+          explore how these themes intersect spatially. The dashboard is meant to help answer
+          questions such as: Which countries are associated with which minerals? Which minerals
+          support multiple technologies? Where might supply concentration create vulnerability?
+        </p>
+        <p>
+          A second goal is to highlight that the clean energy transition is also a materials
+          transition. The shift to electric mobility, renewable power, grid expansion, and
+          advanced electronics depends not just on innovation in devices, but on reliable access
+          to the minerals inside them. The IEA's 2025 outlook notes that demand and supply for
+          these materials are now central to long-term planning, while recent policy actions by
+          the EU, the U.S., and allied countries show that governments increasingly treat
+          mineral supply chains as strategic infrastructure. Just last week, Canada and
+          Australia announced new critical-minerals agreements tied to the G7 production
+          alliance, underscoring how quickly this issue is moving from resource policy into
+          broader geopolitical coordination.
+          <a href="https://www.reuters.com/world/americas/australia-canada-sign-new-deals-critical-minerals-2026-03-05/">Source</a>
+        </p>
+        <p>
+          Ultimately, this dashboard aims to support informed public understanding. It invites
+          users to think beyond a single mine or a single commodity and instead view critical
+          minerals as part of a global network of extraction, processing, trade, technology,
+          and power. In that sense, the project is not only about where minerals are found, but
+          about why those locations matter in the first place.
+        </p>
+      </div>
 
-    <div class="infoSection">
-      <h3>Data Sources</h3>
-      <p>
-        This projects data source comes from the USGS Mineral Resources database. Link: <a href="https://mrdata.usgs.gov/pp1802/">USGS</a>
-        Specifically it is the "Global distribution of selected mines, deposits, and districts of critical minerals" dataset.
-        It has been cleaned using mapshaper.org to convert the original shapefile into a GeoJSON format. We then had to do some
-        additional cleaning to standardize the mineral atriubute of the dataset.
-      </p>
+      <div class="infoSection">
+        <h3>Data Sources</h3>
+        <p>
+          This project's data source comes from the USGS Mineral Resources database. Link:
+          <a href="https://mrdata.usgs.gov/pp1802/">USGS</a>.
+          Specifically, it is the "Global distribution of selected mines, deposits, and districts of critical minerals" dataset.
+          It was cleaned using mapshaper.org to convert the original shapefile into a GeoJSON format. We then completed
+          additional cleaning to standardize the mineral attribute in the dataset.
+        </p>
+      </div>
+
+      <div class="infoSection">
+        <h3>Meet the Team</h3>
+        <p>
+          This dashboard was developed by Group 15: Kenneth Ha, Will Senenko, Li An Song, and Evan Luong.
+          Our team worked collaboratively to design an interactive dashboard that helps users explore
+          the global geography and strategic importance of critical mineral deposits.
+        </p>
+
+        <div class="teamGrid">
+          <div class="teamCard">
+            <img src="images/keni.jpg" alt="Photo of Kenneth Ha" class="teamPhoto">
+            <h4>Kenneth Ha</h4>
+            <p>
+              Contributed to project development, dashboard content, design direction, and debugging in general.
+            </p>
+          </div>
+
+          <div class="teamCard">
+            <img src="images/will.jpg" alt="Photo of Will Senenko" class="teamPhoto">
+            <h4>Will Senenko</h4>
+            <p>
+              Contributed to map development, chart development, dashboard implementation, and technical integration
+              of the interactive features.
+            </p>
+          </div>
+
+          <div class="teamCard">
+            <img src="images/li.jpg" alt="Photo of Li An Song" class="teamPhoto">
+            <h4>Li An Song</h4>
+            <p>
+              Contributed to data preparation, project research, and dashboard structure
+              and information design.
+            </p>
+          </div>
+
+          <div class="teamCard">
+            <img src="images/evan.jpg" alt="Photo of Evan Luong" class="teamPhoto">
+            <h4>Evan Luong</h4>
+            <p>
+              Contributed to map development, interface support, and project research on
+              critical minerals and their applications.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="infoSection">
+        <h3>Course Support</h3>
+        <p>
+          We would like to acknowledge our instructor and teaching assistants for their guidance,
+          feedback, and support throughout the development of this project. Their instruction helped
+          shape both the technical and design direction of this dashboard.
+        </p>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
   <script defer src="js/main.js"></script>
 </body>
