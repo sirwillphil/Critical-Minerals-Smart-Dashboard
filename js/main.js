@@ -41,6 +41,7 @@ let allMineralData = [];
 let popup = null;
 let hoverpopup = null;
 let heatmapVisible = false;
+let dotDensityVisible = true;
 
 const useCases = {
   batteries: { label: "Batteries", minerals: ["Lithium", "Nickel", "Cobalt", "Graphite", "Manganese", "Vanadium", "Lead", "Fluorine", "Fluorite", "Phosphorus"] },
@@ -92,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const toggleLabelsBtn = document.getElementById("toggleLabels");
   const toggleHeatmapBtn = document.getElementById("toggleHeatmap");
+  const toggleDotsBtn = document.getElementById("toggleDots");
 
   const filterPanel = document.getElementById("filterPanel");
   const chartPanel = document.getElementById("chartPanel");
@@ -245,13 +247,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (map.getLayer(IDS.layers.mineralPoints)) {
+      map.setLayoutProperty(IDS.layers.mineralPoints, "visibility", "visible");
       map.setPaintProperty(IDS.layers.mineralPoints, "circle-opacity", 1);
     }
 
     heatmapVisible = false;
+    dotDensityVisible = true;
 
     if (toggleHeatmapBtn) {
       toggleHeatmapBtn.textContent = "Show Heat Map";
+    }
+
+    if (toggleDotsBtn) {
+      toggleDotsBtn.textContent = "Hide Dot Density";
     }
 
     selectedCountry = null;
@@ -543,7 +551,7 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
 
-    if (map.getLayer(IDS.layers.mineralPoints)) {
+    if (map.getLayer(IDS.layers.mineralPoints) && dotDensityVisible) {
       map.setPaintProperty(
         IDS.layers.mineralPoints,
         "circle-opacity",
@@ -553,6 +561,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (toggleHeatmapBtn) {
       toggleHeatmapBtn.textContent = heatmapVisible ? "Hide Heat Map" : "Show Heat Map";
+    }
+  }
+
+  /** Toggle the dot density layer on and off. */
+  function toggleDots() {
+    dotDensityVisible = !dotDensityVisible;
+
+    if (map.getLayer(IDS.layers.mineralPoints)) {
+      map.setLayoutProperty(
+        IDS.layers.mineralPoints,
+        "visibility",
+        dotDensityVisible ? "visible" : "none"
+      );
+
+      if (dotDensityVisible) {
+        map.setPaintProperty(
+          IDS.layers.mineralPoints,
+          "circle-opacity",
+          heatmapVisible ? 0.15 : 1
+        );
+      }
+    }
+
+    if (toggleDotsBtn) {
+      toggleDotsBtn.textContent = dotDensityVisible ? "Hide Dot Density" : "Show Dot Density";
     }
   }
 
@@ -566,6 +599,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     on(toggleLabelsBtn, "click", () => setSymbolsHidden(!symbolsHidden));
     on(toggleHeatmapBtn, "click", toggleHeatmap);
+    on(toggleDotsBtn, "click", toggleDots);
 
     on(searchBtn, "click", handleCountrySearch);
     on(resetBtn, "click", resetAll);
