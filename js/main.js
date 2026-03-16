@@ -21,7 +21,8 @@ const IDS = {
     countryFill: "country-fill",
     countryOutline: "country-outline",
     countryHighlight: "country-highlight",
-    mineralPoints: "mineral-points"
+    mineralPoints: "mineral-points",
+    mineralHeatmap: "mineral-heatmap"
   }
 };
 
