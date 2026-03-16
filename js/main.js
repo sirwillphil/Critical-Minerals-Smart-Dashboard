@@ -91,6 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const metricSelect = document.getElementById("metricSelect");
 
   const toggleLabelsBtn = document.getElementById("toggleLabels");
+  const toggleHeatmapBtn = document.getElementById("toggleHeatmap");
 
   const filterPanel = document.getElementById("filterPanel");
   const chartPanel = document.getElementById("chartPanel");
@@ -237,6 +238,17 @@ document.addEventListener("DOMContentLoaded", () => {
     applyCountryHighlight("");
 
     map.setFilter(IDS.layers.mineralPoints, null);
+    map.setFilter(IDS.layers.mineralHeatmap, null);
+
+    if (map.getLayer(IDS.layers.mineralHeatmap)) {
+      map.setLayoutProperty(IDS.layers.mineralHeatmap, "visibility", "none");
+    }
+
+    heatmapVisible = false;
+
+    if (toggleHeatmapBtn) {
+      toggleHeatmapBtn.textContent = "Show Heat Map";
+    }
 
     selectedCountry = null;
 
@@ -351,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-    /** Escape text for safe HTML output. */
+  /** Escape text for safe HTML output. */
   function escapeHtml(str) {
     return String(str ?? "").replace(/[&<>"']/g, (ch) => ({
       "&": "&amp;",
@@ -470,6 +482,65 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /** Add the heatmap layer. */
+  function addHeatmapLayer() {
+    map.addLayer({
+      id: IDS.layers.mineralHeatmap,
+      type: "heatmap",
+      source: IDS.sources.minerals,
+      layout: {
+        visibility: "none"
+      },
+      paint: {
+        "heatmap-weight": 1,
+        "heatmap-intensity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          1, 0.6,
+          5, 1.2
+        ],
+        "heatmap-radius": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          1, 8,
+          5, 20,
+          8, 30
+        ],
+        "heatmap-opacity": 0.75,
+        "heatmap-color": [
+          "interpolate",
+          ["linear"],
+          ["heatmap-density"],
+          0, "rgba(0,0,255,0)",
+          0.2, "royalblue",
+          0.4, "cyan",
+          0.6, "lime",
+          0.8, "yellow",
+          1, "red"
+        ]
+      }
+    });
+  }
+
+  /** Toggle the heatmap layer on and off. */
+  function toggleHeatmap() {
+    heatmapVisible = !heatmapVisible;
+
+    if (map.getLayer(IDS.layers.mineralHeatmap)) {
+      map.setLayoutProperty(
+        IDS.layers.mineralHeatmap,
+        "visibility",
+        heatmapVisible ? "visible" : "none"
+      );
+    }
+
+    if (toggleHeatmapBtn) {
+      toggleHeatmapBtn.textContent = heatmapVisible ? "Hide Heat Map" : "Show Heat Map";
+    }
+  }
+
   /** Bind all DOM/UI event listeners. */
   function bindUIEvents() {
     on(infoBtn, "click", () => scrollToEl(infoPage));
@@ -479,6 +550,7 @@ document.addEventListener("DOMContentLoaded", () => {
     on(chartToggle, "click", () => togglePanel(chartPanel));
 
     on(toggleLabelsBtn, "click", () => setSymbolsHidden(!symbolsHidden));
+    on(toggleHeatmapBtn, "click", toggleHeatmap);
 
     on(searchBtn, "click", handleCountrySearch);
     on(resetBtn, "click", resetAll);
@@ -491,7 +563,6 @@ document.addEventListener("DOMContentLoaded", () => {
   /** Bind all map-specific interaction listeners. */
   function bindMapEvents() {
     map.on("click", (e) => {
-
       const features = map.queryRenderedFeatures(e.point, {
         layers: [IDS.layers.countryFill]
       });
@@ -516,9 +587,7 @@ document.addEventListener("DOMContentLoaded", () => {
     map.on("mouseenter", IDS.layers.countryFill, () => setCursor("pointer"));
     map.on("mouseleave", IDS.layers.countryFill, () => setCursor(""));
 
-    // HOVER for mineral points
     map.on("mouseenter", IDS.layers.mineralPoints, (e) => {
-
       const feature = e.features?.[0];
       if (!feature) return;
 
@@ -558,7 +627,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .setLngLat(e.lngLat)
         .setHTML(html)
         .addTo(map);
-
     });
 
     map.on("mouseleave", IDS.layers.mineralPoints, () => {
@@ -574,6 +642,7 @@ document.addEventListener("DOMContentLoaded", () => {
     addCountryFillLayer();
     addCountryLayers();
     addMineralLayer();
+    addHeatmapLayer();
     bindUIEvents();
     bindMapEvents();
 
@@ -589,7 +658,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-  function getActiveCheckboxValues(name, allId){
+  function getActiveCheckboxValues(name, allId) {
     const allBox = document.getElementById(allId);
     if (allBox?.checked) return null;
 
@@ -598,21 +667,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return boxes.map(box => box.value);
   }
-  
+
   function countByField(data, field) {
     const counts = {};
     data.forEach(d => {
       const raw = d[field];
       if (!raw) return;
 
-      const values = String(raw).split(',').map(s => s.trim());
+      const values = String(raw).split(",").map(s => s.trim());
       values.forEach(val => {
         if (val) counts[val] = (counts[val] || 0) + 1;
       });
     });
     return counts;
   }
-  
 
   function plotPie(divId, counts, title) {
     const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
@@ -623,10 +691,16 @@ document.addEventListener("DOMContentLoaded", () => {
       type: "pie",
       textinfo: "percent",
       hoverinfo: "label+value+percent"
-    }], {font: {color: 'white'}, title: { text: title},plot_bgcolor: '#3f3f3f',
-        paper_bgcolor: '#3f3f3f', autosize: true, margin: { l: 50, r: 30, t: 50, b: 50 } },
-    { responsive: true }
-    );
+    }], {
+      font: { color: "white" },
+      title: { text: title },
+      plot_bgcolor: "#3f3f3f",
+      paper_bgcolor: "#3f3f3f",
+      autosize: true,
+      margin: { l: 50, r: 30, t: 50, b: 50 }
+    }, {
+      responsive: true
+    });
   }
 
   function plotBar(divId, counts, title) {
@@ -636,8 +710,14 @@ document.addEventListener("DOMContentLoaded", () => {
       x: top.map(d => d[0]),
       y: top.map(d => d[1]),
       type: "bar"
-    }], {font: {color: 'white'},title: { text: title}, plot_bgcolor: '#3f3f3f',
-      paper_bgcolor: '#3f3f3f', autosize: true, margin: { l: 40, r: 20, t: 50, b: 50 } });
+    }], {
+      font: { color: "white" },
+      title: { text: title },
+      plot_bgcolor: "#3f3f3f",
+      paper_bgcolor: "#3f3f3f",
+      autosize: true,
+      margin: { l: 40, r: 20, t: 50, b: 50 }
+    });
   }
 
   function renderCharts(allFeatures) {
@@ -645,7 +725,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const activeUseCases = getActiveCheckboxValues("useCase", "useCase_all");
 
     let filtered = allFeatures;
-    let mapFilters = [];  // collect all filter expressions
+    let mapFilters = [];
     let filterType = "default";
 
     if (selectedCountry) {
@@ -669,7 +749,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (activeUseCases) {
-      // Collect all minerals for the selected use cases
       const useCaseMinerals = new Set();
       activeUseCases.forEach(uc => {
         const minerals = useCases[uc]?.minerals || [];
@@ -677,11 +756,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       filtered = filtered.filter(f => {
-        const commodities = f.commodity.split(',').map(s => s.trim().toLowerCase());
+        const commodities = f.commodity.split(",").map(s => s.trim().toLowerCase());
         return commodities.some(c => useCaseMinerals.has(c));
       });
 
-      // Map filter: substring check for each mineral
       const ucChecks = [...useCaseMinerals].map(m =>
         ["in", m, ["downcase", ["get", "commodity"]]]
       );
@@ -690,12 +768,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!selectedCountry && !activeMinerals) filterType = "useCase";
     }
 
-    // Combine all filters with "all" or clear if none
     const mapFilter = mapFilters.length === 0 ? null
       : mapFilters.length === 1 ? mapFilters[0]
       : ["all", ...mapFilters];
 
     map.setFilter(IDS.layers.mineralPoints, mapFilter);
+    map.setFilter(IDS.layers.mineralHeatmap, mapFilter);
+
     createChart(filtered, filterType);
     return filtered;
   }
@@ -704,15 +783,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (filterType === "country") {
       plotPie("chartOne", countByField(data, "commodity"), "Top 10 Mineral Breakdown");
       plotPie("chartTwo", countByField(data, "dep_type"), "Deposit Type Breakdown");
-
     } else if (filterType === "useCase") {
       plotPie("chartOne", countByField(data, "commodity"), "Top 10 Mineral Breakdown for Use Case");
       plotBar("chartTwo", countByField(data, "country"), "Top 10 Countries by Site Count");
-
     } else if (filterType === "commodity") {
       plotPie("chartOne", countByField(data, "country"), "Country Breakdown for Mineral");
       plotPie("chartTwo", countByField(data, "dep_type"), "Deposit Type Breakdown");
-
     } else {
       plotPie("chartOne", countByField(data, "commodity"), "Top 10 Mineral Breakdown");
       plotBar("chartTwo", countByField(data, "country"), "Top 10 Countries by Site Count");
