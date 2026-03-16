@@ -244,6 +244,10 @@ document.addEventListener("DOMContentLoaded", () => {
       map.setLayoutProperty(IDS.layers.mineralHeatmap, "visibility", "none");
     }
 
+    if (map.getLayer(IDS.layers.mineralPoints)) {
+      map.setPaintProperty(IDS.layers.mineralPoints, "circle-opacity", 1);
+    }
+
     heatmapVisible = false;
 
     if (toggleHeatmapBtn) {
@@ -477,7 +481,8 @@ document.addEventListener("DOMContentLoaded", () => {
         "circle-radius": 6,
         "circle-color": "#ffcc00",
         "circle-stroke-color": "#333",
-        "circle-stroke-width": 1
+        "circle-stroke-width": 1,
+        "circle-opacity": 1
       }
     });
   }
@@ -492,33 +497,35 @@ document.addEventListener("DOMContentLoaded", () => {
         visibility: "none"
       },
       paint: {
-        "heatmap-weight": 1,
+        "heatmap-weight": 2,
         "heatmap-intensity": [
           "interpolate",
           ["linear"],
           ["zoom"],
-          1, 0.6,
-          5, 1.2
+          1, 2,
+          3, 3,
+          5, 4
         ],
         "heatmap-radius": [
           "interpolate",
           ["linear"],
           ["zoom"],
-          1, 8,
-          5, 20,
-          8, 30
+          1, 25,
+          3, 35,
+          5, 45,
+          7, 60
         ],
-        "heatmap-opacity": 0.75,
+        "heatmap-opacity": 0.95,
         "heatmap-color": [
           "interpolate",
           ["linear"],
           ["heatmap-density"],
-          0, "rgba(0,0,255,0)",
-          0.2, "royalblue",
-          0.4, "cyan",
-          0.6, "lime",
-          0.8, "yellow",
-          1, "red"
+          0, "rgba(0,0,0,0)",
+          0.15, "#2c7bb6",
+          0.35, "#00c8ff",
+          0.55, "#7fff00",
+          0.75, "#ffd400",
+          1, "#ff3b00"
         ]
       }
     });
@@ -533,6 +540,14 @@ document.addEventListener("DOMContentLoaded", () => {
         IDS.layers.mineralHeatmap,
         "visibility",
         heatmapVisible ? "visible" : "none"
+      );
+    }
+
+    if (map.getLayer(IDS.layers.mineralPoints)) {
+      map.setPaintProperty(
+        IDS.layers.mineralPoints,
+        "circle-opacity",
+        heatmapVisible ? 0.15 : 1
       );
     }
 
