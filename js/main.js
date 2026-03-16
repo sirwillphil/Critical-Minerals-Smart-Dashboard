@@ -40,6 +40,7 @@ let selectedCountry = null;
 let allMineralData = [];
 let popup = null;
 let hoverpopup = null;
+let heatmapVisible = false;
 
 const useCases = {
   batteries: { label: "Batteries", minerals: ["Lithium", "Nickel", "Cobalt", "Graphite", "Manganese", "Vanadium", "Lead", "Fluorine", "Fluorite", "Phosphorus"] },
