@@ -495,57 +495,49 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-/** Add the heatmap layer. */
-function addHeatmapLayer() {
-  map.addLayer({
-    id: IDS.layers.mineralHeatmap,
-    type: "heatmap",
-    source: IDS.sources.minerals,
-    layout: {
-      visibility: "none"
-    },
-    paint: {
-      "heatmap-weight": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        1, 0.2,
-        3, 0.35,
-        5, 0.5
-      ],
-      "heatmap-intensity": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        1, 0.5,
-        3, 0.8,
-        5, 1.1,
-        7, 1.4
-      ],
-      "heatmap-radius": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        1, 8,
-        3, 14,
-        5, 22,
-        7, 30
-      ],
-      "heatmap-opacity": 0.65,
-      "heatmap-color": [
-        "interpolate",
-        ["linear"],
-        ["heatmap-density"],
-        0, "rgba(0,0,0,0)",
-        0.2, "#2c7bb6",
-        0.4, "#00c8ff",
-        0.6, "#7fff00",
-        0.8, "#ffd400",
-        1, "#ff3b00"
-      ]
-    }
-  });
-}
+  function addHeatmapLayer() {
+    map.addLayer({
+      id: IDS.layers.mineralHeatmap,
+      type: "heatmap",
+      source: IDS.sources.minerals,
+      layout: {
+        visibility: "none"
+      },
+      paint: {
+        "heatmap-weight": 0.05,
+        "heatmap-intensity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          1, 0.15,
+          3, 0.25,
+          5, 0.4,
+          7, 0.6
+        ],
+        "heatmap-radius": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          1, 3,
+          3, 6,
+          5, 10,
+          7, 16
+        ],
+        "heatmap-opacity": 0.45,
+        "heatmap-color": [
+          "interpolate",
+          ["linear"],
+          ["heatmap-density"],
+          0, "rgba(0,0,0,0)",
+          0.25, "rgba(44,123,182,0.35)",
+          0.5, "rgba(0,200,255,0.5)",
+          0.7, "rgba(127,255,0,0.6)",
+          0.85, "rgba(255,212,0,0.7)",
+          1, "rgba(255,59,0,0.8)"
+        ]
+      }
+    });
+  }
 
   /** Toggle the heatmap layer on and off. */
   function toggleHeatmap() {
