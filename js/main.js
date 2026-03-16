@@ -504,8 +504,7 @@ document.addEventListener("DOMContentLoaded", () => {
         visibility: "none"
       },
       paint: {
-        "heatmap-weight": 0.05,
-        "heatmap-intensity": [
+        "heatmap-weight": [
           "interpolate",
           ["linear"],
           ["zoom"],
@@ -514,26 +513,35 @@ document.addEventListener("DOMContentLoaded", () => {
           5, 0.4,
           7, 0.6
         ],
+        "heatmap-intensity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          1, 0.8,
+          3, 1.1,
+          5, 1.5,
+          7, 2
+        ],
         "heatmap-radius": [
           "interpolate",
           ["linear"],
           ["zoom"],
-          1, 3,
-          3, 6,
-          5, 10,
-          7, 16
+          1, 5,
+          3, 8,
+          5, 14,
+          7, 22
         ],
-        "heatmap-opacity": 0.45,
+        "heatmap-opacity": 0.85,
         "heatmap-color": [
           "interpolate",
           ["linear"],
           ["heatmap-density"],
           0, "rgba(0,0,0,0)",
-          0.25, "rgba(44,123,182,0.35)",
-          0.5, "rgba(0,200,255,0.5)",
-          0.7, "rgba(127,255,0,0.6)",
-          0.85, "rgba(255,212,0,0.7)",
-          1, "rgba(255,59,0,0.8)"
+          0.15, "rgba(0,0,0,0)",
+          0.3, "rgba(0,200,255,0.45)",
+          0.5, "rgba(0,255,150,0.65)",
+          0.7, "rgba(255,220,0,0.8)",
+          1, "rgba(255,80,0,0.95)"
         ]
       }
     });
@@ -542,7 +550,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /** Toggle the heatmap layer on and off. */
   function toggleHeatmap() {
     heatmapVisible = !heatmapVisible;
-
+  
     if (map.getLayer(IDS.layers.mineralHeatmap)) {
       map.setLayoutProperty(
         IDS.layers.mineralHeatmap,
@@ -550,15 +558,15 @@ document.addEventListener("DOMContentLoaded", () => {
         heatmapVisible ? "visible" : "none"
       );
     }
-
+  
     if (map.getLayer(IDS.layers.mineralPoints) && dotDensityVisible) {
       map.setPaintProperty(
         IDS.layers.mineralPoints,
         "circle-opacity",
-        heatmapVisible ? 0.15 : 1
+        heatmapVisible ? 0.03 : 1
       );
     }
-
+  
     if (toggleHeatmapBtn) {
       toggleHeatmapBtn.textContent = heatmapVisible ? "Hide Heat Map" : "Show Heat Map";
     }
