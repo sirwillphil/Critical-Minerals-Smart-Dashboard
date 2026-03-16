@@ -87,10 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchBtn = document.getElementById("countrySearchBtn");
   const resetBtn = document.getElementById("resetBtn");
 
-  const mineralSelect = document.getElementById("mineralSelect");
-  const yearSelect = document.getElementById("yearSelect");
-  const metricSelect = document.getElementById("metricSelect");
-
   const toggleLabelsBtn = document.getElementById("toggleLabels");
   const toggleHeatmapBtn = document.getElementById("toggleHeatmap");
   const toggleDotsBtn = document.getElementById("toggleDots");
@@ -495,6 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /** Add the heatmap layer. */
   function addHeatmapLayer() {
     map.addLayer({
       id: IDS.layers.mineralHeatmap,
@@ -508,40 +505,41 @@ document.addEventListener("DOMContentLoaded", () => {
           "interpolate",
           ["linear"],
           ["zoom"],
-          1, 0.15,
-          3, 0.25,
-          5, 0.4,
-          7, 0.6
+          1, 0.6,
+          3, 0.8,
+          5, 1.1,
+          7, 1.4
         ],
         "heatmap-intensity": [
           "interpolate",
           ["linear"],
           ["zoom"],
-          1, 0.8,
-          3, 1.1,
-          5, 1.5,
-          7, 2
+          1, 1.2,
+          3, 1.8,
+          5, 2.4,
+          7, 3
         ],
         "heatmap-radius": [
           "interpolate",
           ["linear"],
           ["zoom"],
-          1, 5,
-          3, 8,
-          5, 14,
-          7, 22
+          1, 4,
+          3, 7,
+          5, 11,
+          7, 16
         ],
-        "heatmap-opacity": 0.85,
+        "heatmap-opacity": 0.95,
         "heatmap-color": [
           "interpolate",
           ["linear"],
           ["heatmap-density"],
           0, "rgba(0,0,0,0)",
-          0.15, "rgba(0,0,0,0)",
-          0.3, "rgba(0,200,255,0.45)",
-          0.5, "rgba(0,255,150,0.65)",
-          0.7, "rgba(255,220,0,0.8)",
-          1, "rgba(255,80,0,0.95)"
+          0.05, "rgba(0,0,0,0)",
+          0.15, "rgba(0,170,255,0.65)",
+          0.35, "rgba(0,255,170,0.8)",
+          0.55, "rgba(255,255,0,0.9)",
+          0.75, "rgba(255,140,0,0.95)",
+          1, "rgba(255,0,0,1)"
         ]
       }
     });
@@ -550,7 +548,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /** Toggle the heatmap layer on and off. */
   function toggleHeatmap() {
     heatmapVisible = !heatmapVisible;
-  
+
     if (map.getLayer(IDS.layers.mineralHeatmap)) {
       map.setLayoutProperty(
         IDS.layers.mineralHeatmap,
@@ -558,15 +556,15 @@ document.addEventListener("DOMContentLoaded", () => {
         heatmapVisible ? "visible" : "none"
       );
     }
-  
-    if (map.getLayer(IDS.layers.mineralPoints) && dotDensityVisible) {
-      map.setPaintProperty(
+
+    if (map.getLayer(IDS.layers.mineralPoints)) {
+      map.setLayoutProperty(
         IDS.layers.mineralPoints,
-        "circle-opacity",
-        heatmapVisible ? 0.03 : 1
+        "visibility",
+        heatmapVisible ? "none" : (dotDensityVisible ? "visible" : "none")
       );
     }
-  
+
     if (toggleHeatmapBtn) {
       toggleHeatmapBtn.textContent = heatmapVisible ? "Hide Heat Map" : "Show Heat Map";
     }
@@ -580,16 +578,8 @@ document.addEventListener("DOMContentLoaded", () => {
       map.setLayoutProperty(
         IDS.layers.mineralPoints,
         "visibility",
-        dotDensityVisible ? "visible" : "none"
+        dotDensityVisible && !heatmapVisible ? "visible" : "none"
       );
-
-      if (dotDensityVisible) {
-        map.setPaintProperty(
-          IDS.layers.mineralPoints,
-          "circle-opacity",
-          heatmapVisible ? 0.15 : 1
-        );
-      }
     }
 
     if (toggleDotsBtn) {
