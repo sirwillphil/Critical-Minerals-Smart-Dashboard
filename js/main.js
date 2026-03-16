@@ -495,49 +495,57 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /** Add the heatmap layer. */
-  function addHeatmapLayer() {
-    map.addLayer({
-      id: IDS.layers.mineralHeatmap,
-      type: "heatmap",
-      source: IDS.sources.minerals,
-      layout: {
-        visibility: "none"
-      },
-      paint: {
-        "heatmap-weight": 2,
-        "heatmap-intensity": [
-          "interpolate",
-          ["linear"],
-          ["zoom"],
-          1, 2,
-          3, 3,
-          5, 4
-        ],
-        "heatmap-radius": [
-          "interpolate",
-          ["linear"],
-          ["zoom"],
-          1, 25,
-          3, 35,
-          5, 45,
-          7, 60
-        ],
-        "heatmap-opacity": 0.95,
-        "heatmap-color": [
-          "interpolate",
-          ["linear"],
-          ["heatmap-density"],
-          0, "rgba(0,0,0,0)",
-          0.15, "#2c7bb6",
-          0.35, "#00c8ff",
-          0.55, "#7fff00",
-          0.75, "#ffd400",
-          1, "#ff3b00"
-        ]
-      }
-    });
-  }
+/** Add the heatmap layer. */
+function addHeatmapLayer() {
+  map.addLayer({
+    id: IDS.layers.mineralHeatmap,
+    type: "heatmap",
+    source: IDS.sources.minerals,
+    layout: {
+      visibility: "none"
+    },
+    paint: {
+      "heatmap-weight": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        1, 0.2,
+        3, 0.35,
+        5, 0.5
+      ],
+      "heatmap-intensity": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        1, 0.5,
+        3, 0.8,
+        5, 1.1,
+        7, 1.4
+      ],
+      "heatmap-radius": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        1, 8,
+        3, 14,
+        5, 22,
+        7, 30
+      ],
+      "heatmap-opacity": 0.65,
+      "heatmap-color": [
+        "interpolate",
+        ["linear"],
+        ["heatmap-density"],
+        0, "rgba(0,0,0,0)",
+        0.2, "#2c7bb6",
+        0.4, "#00c8ff",
+        0.6, "#7fff00",
+        0.8, "#ffd400",
+        1, "#ff3b00"
+      ]
+    }
+  });
+}
 
   /** Toggle the heatmap layer on and off. */
   function toggleHeatmap() {
